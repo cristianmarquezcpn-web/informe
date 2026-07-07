@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Informes - Esencial Pro</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; padding: 30px; max-width: 900px; margin: 0 auto; }
+        h2 { color: #1a2a6c; margin-bottom: 20px; border-bottom: 3px solid #3b82f6; padding-bottom: 10px; }
+        select, textarea, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #d1d5db; font-size: 14px; }
+        select { background: white; cursor: pointer; }
+        textarea { min-height: 120px; font-family: inherit; resize: vertical; }
+        button { background: #1a2a6c; color: white; font-weight: bold; border: none; cursor: pointer; transition: 0.2s; }
+        button:hover { background: #3b82f6; transform: scale(1.01); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .badge { background: #3b82f6; color: white; padding: 2px 10px; border-radius: 12px; font-size: 12px; }
+        #vista-previa { background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; margin-top: 15px; font-size: 13px; line-height: 1.6; white-space: pre-wrap; max-height: 400px; overflow-y: auto; }
+        .loading { text-align: center; padding: 20px; color: #64748b; }
+        .stats { display: flex; gap: 10px; margin: 10px 0; flex-wrap: wrap; }
+        .stat-item { background: #e2e8f0; padding: 8px 15px; border-radius: 8px; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <h2>📋 Generador de Informes Profesionales - Esencial</h2>
+    
+    <div class="card">
+        <div class="grid">
+            <div>
+                <label><b>Módulo:</b></label>
+                <select id="mod" onchange="listarPacientes()">
+                    <option value="CD">Centro de Día (CD)</option>
+                    <option value="CET">CET</option>
+                    <option value="REHAB">Rehabilitación (REHAB)</option>
+                </select>
+            </div>
+            <div>
+                <label><b>Paciente:</b></label>
+                <select id="paciente-select" onchange="cargarDatosPaciente()">
+                    <option value="">Seleccionar paciente...</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <span class="stat-item" id="stats-pacientes">👥 0 pacientes</span>
+            <span class="stat-item" id="stats-cud">📅 0 CUD activos</span>
+        </div>
+    </div>
+    
+    <div class="card" id="datos-paciente" style="display:none; margin-top: 20px;">
+        <h3 style="margin-bottom:10px;">📄 Datos del paciente: <span id="nombre-paciente"></span></h3>
+        
+        <div id="info-paciente" style="margin-bottom:15px; font-size:13px; background:#f8fafc; padding:12px; border-radius:8px;"></div>
+        
+        <div class="grid">
+            <div>
+                <label><b>👩‍⚕️ Notas de Trabajo Social:</b></label>
+                <textarea id="social" placeholder="Ej: Vínculos familiares, situación habitacional..."></textarea>
+            </div>
+            <div>
+                <label><b>🧠 Notas de Psicología:</b></label>
+                <textarea id="psico" placeholder="Ej: Evaluación cognitiva, estado emocional..."></textarea>
+            </div>
+        </div>
+        
+        <div class="grid" style="margin-top:5px;">
+            <div>
+                <label><b>📋 Notas de Terapia Ocupacional:</b></label>
+                <textarea id="to" placeholder="Ej: Actividades de la vida diaria, motricidad fina..."></textarea>
+            </div>
+            <div>
+                <label><b>🗣️ Notas de Fonoaudiología:</b></label>
+                <textarea id="fono" placeholder="Ej: Lenguaje, deglución, comunicación..."></textarea>
+            </div>
+        </div>
+        
+        <div style="margin-top:5px;">
+            <label><b>📝 Observaciones adicionales / Recomendaciones:</b></label>
+            <textarea id="adicional" placeholder="Ej: Frecuencia sugerida, derivaciones, interconsultas..." style="min-height:80px;"></textarea>
+        </div>
+        
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <button onclick="generarInforme()" style="flex:2;">📄 GENERAR INFORME PDF</button>
+            <button onclick="generarBorradorIA()" style="flex:1; background:#10b981;">🤖 BORRADOR IA</button>
+            <button onclick="guardarBorrador()" style="flex:1; background:#8b5cf6;">💾 GUARDAR NOTAS</button>
+        </div>
+    </div>
+    
+    <div class="card" id="vista-previa-container" style="display:none; margin-top: 20px;">
+        <h3 style="margin-bottom:10px;">👁️ Vista previa del informe</h3>
+        <div id="vista-previa">Cargando...</div>
+    </div>
+
+    <script>
+        // ============================================================
+        // CONFIGURACIÓN FIREBASE
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAugXXxbwKFByhDbLZslk2HAUTzrzd8",
+            authDomain: "clinicaintegral-5c488.firebaseapp.com",
+            databaseURL: "https://clinicaintegral-5c488-default-rtdb.firebaseio.com",
+            projectId: "clinicaintegral-5c488",
+            storageBucket: "clinicaintegral-5c488.appspot.com",
+            appId: "1:184090967634:web:09715937b33ea48288698b"
+        };
+
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let pacienteActual = null;
+        let datosPacienteCompleto = {};
+
+        // ============================================================
+        // 1. LISTAR PACIENTES
+        // ============================================================
+        function listarPacientes() {
+            const mod = document.getElementById('mod').value;
+            const select = document.getElementById('paciente-select');
+            select.innerHTML = '<option value="">⏳ Cargando pacientes...</option>';
+            
+            db.ref(mod + '/pacientes').once('value', snap => {
+                select.innerHTML = '<option value="">Seleccionar paciente...</option>';
+                let count = 0;
+                
+                snap.forEach(child => {
+                    const pac = child.val();
+                    const nombre = child.key;
+                    
+                    if (pac && nombre) {
+                        const option = document.createElement('option');
+                        option.value = nombre;
+                        let label = nombre;
+                        if (pac.cud) label += ` (CUD: ${pac.cud})`;
+                        option.textContent = label;
+                        select.appendChild(option);
+                        count++;
+                    }
+                });
+                
+                document.getElementById('stats-pacientes').textContent = `👥 ${count} pacientes`;
+                if (count === 0) select.innerHTML = '<option value="">❌ No hay pacientes en este módulo</option>';
+            }, error => {
+                console.error("Error cargando pacientes:", error);
+                select.innerHTML = '<option value="">❌ Error al cargar: ' + error.message + '</option>';
+            });
+        }
+
+        // ============================================================
+        // 2. CARGAR DATOS DEL PACIENTE
+        // ============================================================
+        function cargarDatosPaciente() {
+            const select = document.getElementById('paciente-select');
+            const nombre = select.value;
+            const mod = document.getElementById('mod').value;
+            const container = document.getElementById('datos-paciente');
+            const infoDiv = document.getElementById('info-paciente');
+            
+            if (!nombre) {
+                container.style.display = 'none';
+                document.getElementById('vista-previa-container').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('nombre-paciente').textContent = nombre;
+            container.style.display = 'block';
+            infoDiv.innerHTML = '<div class="loading">Cargando datos...</div>';
+            
+            db.ref(mod + '/pacientes/' + nombre).once('value', snap => {
+                const datos = snap.val();
+                pacienteActual = datos;
+                datosPacienteCompleto = datos || {};
+                
+                if (!datos) {
+                    infoDiv.innerHTML = '<span style="color:#ef4444;">⚠️ No se encontraron datos para este paciente</span>';
+                    return;
+                }
+                
+                let html = '<table style="width:100%; border-collapse:collapse; font-size:12px;">';
+                const campos = [
+                    { label: '📅 CUD', key: 'cud' },
+                    { label: '🏠 Domicilio', key: 'domicilio' },
+                    { label: '📞 Teléfono', key: 'telefono' },
+                    { label: '👤 Obra Social', key: 'os' },
+                    { label: '🎂 Fecha Nac.', key: 'nac' },
+                    { label: '📋 Diagnóstico', key: 'diagnostico' }
+                ];
+                
+                campos.forEach(c => {
+                    if (datos[c.key]) {
+                        html += `<tr>
+                            <td style="padding:4px 8px; font-weight:600; color:#64748b; width:120px;">${c.label}</td>
+                            <td style="padding:4px 8px;">${datos[c.key]}</td>
+                        </tr>`;
+                    }
+                });
+                html += '</table>';
+                
+                if (datos.cud) {
+                    // Corrección del formato de fecha para evitar desfases horarios
+                    const venc = new Date(datos.cud + 'T00:00:00'); 
+                    const diff = Math.floor((venc - new Date()) / (1000 * 60 * 60 * 24));
+                    if (diff > 0) {
+                        document.getElementById('stats-cud').textContent = `📅 CUD vigente (${diff} días)`;
+                    } else {
+                        document.getElementById('stats-cud').textContent = `🔴 CUD vencido (hace ${Math.abs(diff)} días)`;
+                    }
+                }
+                
+                infoDiv.innerHTML = html;
+                
+                // Cargar notas previas
+                db.ref('informes/' + nombre).limitToLast(1).once('value', snap => {
+                    snap.forEach(child => {
+                        const inf = child.val();
+                        if (inf && inf.texto) {
+                            const adicional = document.getElementById('adicional');
+                            if (!adicional.value) adicional.value = "📌 Informe anterior: " + inf.texto.substring(0, 200) + "...";
+                        }
+                    });
+                });
+                
+            }, error => {
+                infoDiv.innerHTML = `<span style="color:#ef4444;">❌ Error: ${error.message}</span>`;
+            });
+        }
+
+        // ============================================================
+        // 3. GENERAR BORRADOR CON IA (ESTILO "CHOQUE DE IMÁGENES")
+        // ============================================================
+        async function generarBorradorIA() {
+            const nombre = document.getElementById('paciente-select').value;
+            if (!nombre) return alert("Seleccioná un paciente primero");
+            
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '⏳ Generando Redacción Clínica...';
+            
+            try {
+                const datos = {
+                    nombre: nombre,
+                    modulo: document.getElementById('mod').value,
+                    social: document.getElementById('social').value,
+                    psico: document.getElementById('psico').value,
+                    to: document.getElementById('to').value,
+                    fono: document.getElementById('fono').value
+                };
+                
+                // Prompt optimizado para un estilo clínico directo y no narrativo
+                const prompt = `Actúas como especialista clínico interdisciplinario. 
+                Genera un informe formal de evolución.
+                PACIENTE: ${datos.nombre} - MÓDULO: ${datos.modulo}
+                
+                DATOS EN BRUTO:
+                Trabajo Social: ${datos.social}
+                Psicología: ${datos.psico}
+                Terapia Ocupacional: ${datos.to}
+                Fonoaudiología: ${datos.fono}
+                
+                INSTRUCCIONES DE ESTILO ESTRICTAS:
+                1. Evita la narración lineal y los conectores superfluos (no uses frases como "podemos observar que", "es importante destacar").
+                2. Prioriza el "choque de imágenes": describe los estados clínicos mediante la exposición directa de observaciones, síntomas y respuestas a estímulos. 
+                3. La redacción debe ser una disección biológica y conductual del paciente.
+                4. Estructura el informe separando claramente las áreas (Área Psicológica, Área Social, etc.) basándote única y exclusivamente en los datos proporcionados.
+                5. Finaliza con sugerencias terapéuticas breves.`;
+                
+                const respuesta = await fetch('https://api.deepseek.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer sk-134a123b5eac4922bab50f18fd87bf1b'
+                    },
+                    body: JSON.stringify({
+                        model: 'deepseek-chat',
+                        messages: [
+                            { role: 'system', content: 'Eres un redactor clínico experto, preciso y objetivo.' },
+                            { role: 'user', content: prompt }
+                        ],
+                        max_tokens: 2000,
+                        temperature: 0.3 // Temperatura baja para respuestas más clínicas y menos creativas
+                    })
+                });
+                
+                if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
+                
+                const data = await respuesta.json();
+                const textoGenerado = data.choices[0].message.content;
+                
+                const vistaPrevia = document.getElementById('vista-previa');
+                vistaPrevia.textContent = textoGenerado;
+                document.getElementById('vista-previa-container').style.display = 'block';
+                document.getElementById('adicional').value = textoGenerado;
+                
+            } catch(e) {
+                console.error("Error IA:", e);
+                alert("Error al conectar con la IA. Generando formato estructural local...");
+                generarPlantillaLocal();
+            }
+            
+            btn.disabled = false;
+            btn.textContent = '🤖 BORRADOR IA';
+        }
+
+        // ============================================================
+        // 4. PLANTILLA LOCAL (MEJORADA)
+        // ============================================================
+        function generarPlantillaLocal() {
+            const nombre = document.getElementById('paciente-select').value;
+            const mod = document.getElementById('mod').value;
+            const fecha = new Date().toLocaleDateString('es-AR');
+            
+            let texto = `INFORME CLÍNICO DE EVOLUCIÓN
+Fecha: ${fecha} | Paciente: ${nombre} | Modalidad: ${mod}
+
+--------------------------------------------------
+OBSERVACIONES CLÍNICAS DIRECTAS:
+
+${document.getElementById('social').value ? 'ÁREA SOCIAL:\n' + document.getElementById('social').value + '\n\n' : ''}
+${document.getElementById('psico').value ? 'ÁREA PSICOLOGÍA:\n' + document.getElementById('psico').value + '\n\n' : ''}
+${document.getElementById('to').value ? 'TERAPIA OCUPACIONAL:\n' + document.getElementById('to').value + '\n\n' : ''}
+${document.getElementById('fono').value ? 'FONOAUDIOLOGÍA:\n' + document.getElementById('fono').value + '\n\n' : ''}
+
+--------------------------------------------------
+DIRECCIÓN TERAPÉUTICA:
+Continuidad del esquema de abordaje actual. Monitoreo constante de respuestas a estímulos.
+Firma: Equipo Interdisciplinario Esencial`;
+
+            document.getElementById('vista-previa').textContent = texto;
+            document.getElementById('vista-previa-container').style.display = 'block';
+            document.getElementById('adicional').value = texto;
+        }
+
+        // ============================================================
+        // 5. GENERACIÓN PDF Y PERSISTENCIA
+        // ============================================================
+        async function generarInforme() {
+            const nombre = document.getElementById('paciente-select').value;
+            if (!nombre) return alert("Selecciona un paciente.");
+            
+            const texto = document.getElementById('adicional').value;
+            if (!texto || texto.includes('Cargando')) return alert("Genera el texto (IA o Manual) antes de crear el PDF.");
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            
+            const marginLeft = 20, marginRight = 20, pageWidth = 210;
+            const usableWidth = pageWidth - marginLeft - marginRight;
+            let y = 20;
+            
+            // Encabezado
+            doc.setFillColor(26, 42, 108);
+            doc.rect(0, 0, pageWidth, 35, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(18);
+            doc.setFont('helvetica', 'bold');
+            doc.text('ESENCIAL', pageWidth / 2, 15, { align: 'center' });
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text('INFORME CLÍNICO DE EVOLUCIÓN', pageWidth / 2, 23, { align: 'center' });
+            doc.setFontSize(8);
+            doc.text(new Date().toLocaleDateString('es-AR'), pageWidth / 2, 30, { align: 'center' });
+            
+            y = 45;
+            
+            // Datos
+            doc.setTextColor(26, 42, 108);
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'bold');
+            doc.text('DATOS DEL PACIENTE', marginLeft, y);
+            y += 5;
+            doc.setDrawColor(59, 130, 246);
+            doc.line(marginLeft, y, pageWidth - marginRight, y);
+            y += 7;
+            
+            doc.setTextColor(51, 51, 51);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Paciente: ${nombre} | Módulo: ${document.getElementById('mod').value}`, marginLeft, y);
+            y += 10;
+            
+            // Cuerpo del Informe
+            doc.setTextColor(26, 42, 108);
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'bold');
+            doc.text('REGISTRO DE EVOLUCIÓN', marginLeft, y);
+            y += 5;
+            doc.line(marginLeft, y, pageWidth - marginRight, y);
+            y += 7;
+            
+            doc.setTextColor(51, 51, 51);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            
+            const lineas = doc.splitTextToSize(texto, usableWidth);
+            lineas.forEach(linea => {
+                if (y > 275) { doc.addPage(); y = 20; }
+                doc.text(linea, marginLeft, y);
+                y += 5.5;
+            });
+            
+            // Guardar archivo físico
+            doc.save(`Informe_Esencial_${nombre.replace(/\s+/g, '_')}.pdf`);
+            
+            // Guardar en Firebase
+            try {
+                await db.ref('informes/' + nombre).push({
+                    fecha: Date.now(),
+                    texto: texto,
+                    modulo: document.getElementById('mod').value
+                });
+            } catch(e) {
+                console.error("Error de guardado en la nube:", e);
+            }
+        }
+
+        // ============================================================
+        // 6. GUARDAR BORRADOR RÁPIDO
+        // ============================================================
+        function guardarBorrador() {
+            const nombre = document.getElementById('paciente-select').value;
+            if (!nombre) return alert("Selecciona un paciente.");
+            
+            const datos = {
+                social: document.getElementById('social').value,
+                psico: document.getElementById('psico').value,
+                to: document.getElementById('to').value,
+                fono: document.getElementById('fono').value,
+                timestamp: Date.now()
+            };
+            
+            db.ref('borradores/' + nombre).set(datos)
+                .then(() => alert("✅ Notas guardadas exitosamente."))
+                .catch(e => alert("❌ Error: " + e.message));
+        }
+
+        // Arranque
+        window.onload = listarPacientes;
+    </script>
+</body>
+</html>
