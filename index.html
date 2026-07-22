@@ -29,11 +29,9 @@
         .stats { display: flex; gap: 10px; margin: 10px 0; flex-wrap: wrap; }
         .stat-item { background: #e2e8f0; padding: 8px 15px; border-radius: 8px; font-size: 12px; }
         
-        /* Estilos del modal de login */
         #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 42, 108, 0.9); z-index: 9999; display: flex; justify-content: center; align-items: center; }
         .login-box { background: white; padding: 40px; border-radius: 12px; width: 350px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         
-        /* Estilos del editor */
         #editor-container { height: 400px; background: white; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
         .ql-toolbar { border-top-left-radius: 8px; border-top-right-radius: 8px; background: #f8fafc; }
     </style>
@@ -44,7 +42,6 @@
         <h2 style="border:none; color:#1a2a6c;">ESENCIAL</h2>
         <p style="margin-bottom: 20px; color: #64748b;">Acceso seguro con cuenta de Google</p>
         
-        <!-- Botón de Google -->
         <button onclick="iniciarSesionGoogle()" style="background: #ffffff; color: #555; border: 1px solid #ccc; font-weight: bold;">
             <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" style="width:20px; margin-right:10px;">
             INGRESAR CON GOOGLE
@@ -86,36 +83,39 @@
             <h3 style="margin-bottom:10px;">📄 Datos del paciente: <span id="nombre-paciente"></span></h3>
             <div id="info-paciente" style="margin-bottom:15px; font-size:13px; background:#f8fafc; padding:12px; border-radius:8px;"></div>
             
-            <!-- NUEVOS CAMPOS DEL INFORME TRIMESTRAL -->
+            <!-- SELECTOR DE TIPO DE INFORME Y ÁREA -->
             <div class="grid">
                 <div>
-                    <label><b>● ÁREA:</b></label>
-                    <input type="text" id="area-rep" placeholder="Ej: Psicología, Terapia Ocupacional...">
+                    <label><b>TIPO DE INFORME:</b></label>
+                    <select id="tipo-informe" onchange="actualizarEstructuraInforme()">
+                        <option value="inicial">Informe Inicial</option>
+                        <option value="trimestral1">Informe Trimestral 1</option>
+                        <option value="trimestral2">Informe Trimestral 2</option>
+                        <option value="trimestral3">Informe Trimestral 3</option>
+                        <option value="plan">Plan Terapéutico</option>
+                    </select>
                 </div>
                 <div>
-                    <label><b>● PROFESIONAL:</b></label>
-                    <input type="text" id="profesional-rep" placeholder="Nombre completo del profesional">
+                    <label><b>● ÁREA:</b></label>
+                    <select id="area-rep">
+                        <option value="Psicología">Psicología</option>
+                        <option value="Psicopedagogía">Psicopedagogía</option>
+                        <option value="Kinesiología">Kinesiología</option>
+                        <option value="Terapia Ocupacional">Terapia Ocupacional</option>
+                        <option value="Fonoaudiología">Fonoaudiología</option>
+                        <option value="Trabajo Social">Trabajo Social</option>
+                    </select>
                 </div>
             </div>
-            
+
             <div style="margin-top:15px;">
-                <label><b>TEST ADMINISTRADOS:</b></label>
-                <textarea id="test-admin" placeholder="Escribe aquí..."></textarea>
+                <label><b>● PROFESIONAL:</b></label>
+                <input type="text" id="profesional-rep" placeholder="Nombre completo del profesional">
             </div>
             
-            <div style="margin-top:15px;">
-                <label><b>RESULTADOS OBTENIDOS E INTERPRETACIÓN DE TEST ADMINISTRADOS:</b></label>
-                <textarea id="resultados" placeholder="Escribe aquí..."></textarea>
-            </div>
-            
-            <div style="margin-top:15px;">
-                <label><b>SÍNTESIS Y CONCLUSIONES:</b></label>
-                <textarea id="sintesis" placeholder="Escribe aquí..."></textarea>
-            </div>
-            
-            <div style="margin-top:15px;">
-                <label><b>SUGERENCIAS ESCUELA REGULAR:</b></label>
-                <textarea id="sugerencias" placeholder="Escribe aquí..."></textarea>
+            <!-- CONTENEDOR DINÁMICO DE CAMPOS SEGÚN EL INFORME -->
+            <div id="campos-dinamicos-informe">
+                <!-- Se inyecta según la selección -->
             </div>
 
             <div style="display:flex; gap:10px; margin-top:15px; margin-bottom: 25px;">
@@ -139,9 +139,6 @@
     </div>
 
     <script>
-        // ============================================================
-        // CONFIGURACIÓN FIREBASE
-        // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyAugXXx_b_wKFByhDbLZslk2HA_UTzrzd8",
             authDomain: "clinicaintegral-5c488.firebaseapp.com",
@@ -159,9 +156,6 @@
         let datosPacienteCompleto = {};
         let quillEditor;
 
-        // ============================================================
-        // INICIALIZACIÓN DEL EDITOR TIPO WORD (QUILL.JS)
-        // ============================================================
         window.onload = function() {
             quillEditor = new Quill('#editor-container', {
                 theme: 'snow',
@@ -177,11 +171,9 @@
                 },
                 placeholder: 'El texto corregido aparecerá aquí. Puedes modificarlo, cambiar fuentes y pegar firmas...'
             });
+            actualizarEstructuraInforme();
         };
 
-        // ============================================================
-        // SISTEMA DE LOGIN
-        // ============================================================
         auth.onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('login-overlay').style.display = 'none';
@@ -193,23 +185,18 @@
             }
         });
 
-       const provider = new firebase.auth.GoogleAuthProvider();
-       function iniciarSesionGoogle() {
-           auth.signInWithPopup(provider).then((result) => {
-               // Exitoso
-           }).catch((error) => {
-               console.error("Error al ingresar: ", error);
-               alert("No se pudo iniciar sesión: " + error.message);
-           });
-       }
+        const provider = new firebase.auth.GoogleAuthProvider();
+        function iniciarSesionGoogle() {
+            auth.signInWithPopup(provider).catch((error) => {
+                console.error("Error al ingresar: ", error);
+                alert("No se pudo iniciar sesión: " + error.message);
+            });
+        }
 
         function cerrarSesion() {
             auth.signOut();
         }
 
-        // ============================================================
-        // 1. LISTAR PACIENTES
-        // ============================================================
         function listarPacientes() {
             const mod = document.getElementById('mod').value;
             const select = document.getElementById('paciente-select');
@@ -235,9 +222,6 @@
             });
         }
 
-        // ============================================================
-        // 2. CARGAR DATOS DEL PACIENTE
-        // ============================================================
         function cargarDatosPaciente() {
             const select = document.getElementById('paciente-select');
             const nombre = select.value;
@@ -270,40 +254,104 @@
                 infoDiv.innerHTML = html + '</table>';
 
                 quillEditor.root.innerHTML = '';
-                document.getElementById('test-admin').value = '';
-                document.getElementById('resultados').value = '';
-                document.getElementById('sintesis').value = '';
-                document.getElementById('sugerencias').value = '';
+                limpiarCamposFormulario();
             });
         }
 
-        // ============================================================
-        // 3. CORREGIR ORTOGRAFÍA ESTRICTA Y CARGAR AL EDITOR
-        // ============================================================
+        function limpiarCamposFormulario() {
+            const ids = ['test-admin', 'resultados', 'sintesis', 'sugerencias', 'objetivos', 'evaluacion', 'estrategias', 'evolucion'];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+        }
+
+        function actualizarEstructuraInforme() {
+            const tipo = document.getElementById('tipo-informe').value;
+            const contenedor = document.getElementById('campos-dinamicos-informe');
+            
+            if (tipo === 'inicial') {
+                contenedor.innerHTML = `
+                    <div style="margin-top:15px;">
+                        <label><b>EVALUACIÓN INICIAL / MOTIVO DE CONSULTA:</b></label>
+                        <textarea id="resultados" placeholder="Describa la evaluación inicial..."></textarea>
+                    </div>
+                    <div style="margin-top:15px;">
+                        <label><b>OBJETIVOS TERAPÉUTICOS PROPUESTOS:</b></label>
+                        <textarea id="sintesis" placeholder="Escriba los objetivos..."></textarea>
+                    </div>
+                `;
+            } else if (tipo.startsWith('trimestral')) {
+                contenedor.innerHTML = `
+                    <div style="margin-top:15px;">
+                        <label><b>TEST ADMINISTRADOS:</b></label>
+                        <textarea id="test-admin" placeholder="Escribe aquí..."></textarea>
+                    </div>
+                    <div style="margin-top:15px;">
+                        <label><b>RESULTADOS OBTENIDOS E INTERPRETACIÓN DE TEST ADMINISTRADOS:</b></label>
+                        <textarea id="resultados" placeholder="Escribe aquí..."></textarea>
+                    </div>
+                    <div style="margin-top:15px;">
+                        <label><b>SÍNTESIS Y CONCLUSIONES:</b></label>
+                        <textarea id="sintesis" placeholder="Escribe aquí..."></textarea>
+                    </div>
+                    <div style="margin-top:15px;">
+                        <label><b>SUGERENCIAS ESCUELA REGULAR / FAMILIA:</b></label>
+                        <textarea id="sugerencias" placeholder="Escribe aquí..."></textarea>
+                    </div>
+                `;
+            } else if (tipo === 'plan') {
+                contenedor.innerHTML = `
+                    <div style="margin-top:15px;">
+                        <label><b>DIAGNÓSTICO SITUACIONAL:</b></label>
+                        <textarea id="resultados" placeholder="Escriba el diagnóstico situacional..."></textarea>
+                    </div>
+                    <div style="margin-top:15px;">
+                        <label><b>PLAN DE TRABAJO Y ESTRATEGIAS:</b></label>
+                        <textarea id="sintesis" placeholder="Escriba el plan terapéutico..."></textarea>
+                    </div>
+                `;
+            }
+        }
+
         async function generarBorradorIA() {
             const nombre = document.getElementById('paciente-select').value;
             if (!nombre) return alert("Seleccioná un paciente primero");
             
-            const btn = document.getElementById('btn-ia'); // CORRECCIÓN AQUÍ
+            const btn = document.getElementById('btn-ia');
             btn.disabled = true;
             btn.textContent = '⏳ Corrigiendo ortografía y concordancia...';
             
             try {
-                const test = document.getElementById('test-admin').value;
-                const resultados = document.getElementById('resultados').value;
-                const sintesis = document.getElementById('sintesis').value;
-                const sugerencias = document.getElementById('sugerencias').value;
+                const tipo = document.getElementById('tipo-informe').value;
+                let promptParts = '';
                 
-                // INSTRUCCIÓN ESTRICTA
+                if (tipo.startsWith('trimestral')) {
+                    const test = document.getElementById('test-admin').value;
+                    const resultados = document.getElementById('resultados').value;
+                    const sintesis = document.getElementById('sintesis').value;
+                    const sugerencias = document.getElementById('sugerencias').value;
+                    
+                    promptParts = `
+                        <p><strong>TEST ADMINISTRADOS:</strong><br>${test}</p><br>
+                        <p><strong>RESULTADOS OBTENIDOS E INTERPRETACIÓN DE TEST ADMINISTRADOS:</strong><br>${resultados}</p><br>
+                        <p><strong>SÍNTESIS Y CONCLUSIONES:</strong><br>${sintesis}</p><br>
+                        <p><strong>SUGERENCIAS ESCUELA REGULAR:</strong><br>${sugerencias}</p>
+                    `;
+                } else {
+                    const resultados = document.getElementById('resultados').value;
+                    const sintesis = document.getElementById('sintesis').value;
+                    promptParts = `
+                        <p><strong>DESARROLLO / RESULTADOS:</strong><br>${resultados}</p><br>
+                        <p><strong>SÍNTESIS Y PLANIFICACIÓN:</strong><br>${sintesis}</p>
+                    `;
+                }
+
                 const prompt = `Actúa como un corrector ortotipográfico estricto. Señala repeticiones y errores de puntuación, pero no cambies ni una sola palabra de mi estilo narrativo. I want you to only correct commas and spelling errors, but never write a single syllable nueva que no esté en el original.
 
 Devuelve el texto corregido estructurado exactamente así en HTML:
-<p><strong>TEST ADMINISTRADOS:</strong><br>${test}</p><br>
-<p><strong>RESULTADOS OBTENIDOS E INTERPRETACIÓN DE TEST ADMINISTRADOS:</strong><br>${resultados}</p><br>
-<p><strong>SÍNTESIS Y CONCLUSIONES:</strong><br>${sintesis}</p><br>
-<p><strong>SUGERENCIAS ESCUELA REGULAR:</strong><br>${sugerencias}</p>`;
+${promptParts}`;
                 
-                // CORRECCIÓN URL Y PETICIÓN
                 const respuesta = await fetch('https://api.deepseek.com/chat/completions', {
                     method: 'POST',
                     headers: {
@@ -330,33 +378,26 @@ Devuelve el texto corregido estructurado exactamente así en HTML:
             } catch(e) {
                 console.error("Error en conexión con DeepSeek:", e);
                 alert("Hubo un error con la corrección IA. Se pasará el texto tal cual al editor.");
-                const htmlEmergencia = `
-                    <p><strong>TEST ADMINISTRADOS:</strong><br>${document.getElementById('test-admin').value}</p><br>
-                    <p><strong>RESULTADOS OBTENIDOS E INTERPRETACIÓN DE TEST ADMINISTRADOS:</strong><br>${document.getElementById('resultados').value}</p><br>
-                    <p><strong>SÍNTESIS Y CONCLUSIONES:</strong><br>${document.getElementById('sintesis').value}</p><br>
-                    <p><strong>SUGERENCIAS ESCUELA REGULAR:</strong><br>${document.getElementById('sugerencias').value}</p>
-                `;
-                quillEditor.clipboard.dangerouslyPasteHTML(htmlEmergencia);
+                quillEditor.clipboard.dangerouslyPasteHTML(quillEditor.root.innerHTML);
             }
             
             btn.disabled = false;
             btn.textContent = '🤖 CORREGIR ORTOGRAFÍA Y PASAR AL EDITOR';
         }
 
-        // ============================================================
-        // 4. EXPORTAR EL CONTENIDO A PDF CON ROTULOS
-        // ============================================================
         function exportarPDF() {
             const nombre = document.getElementById('paciente-select').value;
             if (!nombre) return alert("Selecciona un paciente.");
             
             const area = document.getElementById('area-rep').value || '_________________';
             const profesional = document.getElementById('profesional-rep').value || '_________________';
+            const tipoInforme = document.getElementById('tipo-informe');
+            const textoTipoInforme = tipoInforme.options[tipoInforme.selectedIndex].text.toUpperCase();
             
             const anioActual = new Date().getFullYear();
             const fechaHoy = new Date().toLocaleDateString('es-AR');
             
-            const fechaNac = datosPacienteCompleto.nacimiento || datosPacienteCompleto.nac || datosPacienteCompleto.fechaNacimiento || 'S/D';
+            const fechaNac = datosPacienteCompleto.nacimiento || datosPacienteCompleto.nac || datosPacienteCompleto.fechaNacimiento || datosPacienteCompleto.fechanac || 'S/D';
             const edad = datosPacienteCompleto.edad || 'S/D';
             const diagnostico = datosPacienteCompleto.diagnostico || datosPacienteCompleto.diag || 'S/D';
             
@@ -368,19 +409,16 @@ Devuelve el texto corregido estructurado exactamente así en HTML:
             elementoTemporal.style.minHeight = "1050px";
             
             elementoTemporal.innerHTML = `
-                <!-- ROTULO SUPERIOR -->
                 <div style="display: flex; align-items: flex-end; margin-bottom: 40px;">
                     <h1 style="color: #1a2a6c; margin: 0; font-size: 42px; font-weight: bold; line-height: 0.8; font-family: 'Georgia', serif;">Esencial</h1>
                     <div style="flex-grow: 1; height: 3px; background-color: #1a2a6c; margin-left: 15px; margin-bottom: 6px;"></div>
                 </div>
 
-                <!-- TÍTULO -->
                 <div style="text-align: center; font-weight: bold; margin-bottom: 30px; font-size: 15px;">
-                    <div style="text-decoration: underline;">INFORME PRIMER TRIMESTRE/ PROCESO</div>
+                    <div style="text-decoration: underline;">${textoType(textoTipoInforme)}</div>
                     <div style="margin-top: 5px;">${anioActual}</div>
                 </div>
 
-                <!-- DATOS DEL BENEFICIARIO -->
                 <ul style="list-style-type: disc; margin-bottom: 40px; padding-left: 40px; line-height: 2.2;">
                     <li><strong>ÁREA:</strong> <span style="text-transform: uppercase;">${area}</span></li>
                     <li><strong>APELLIDO Y NOMBRE DEL BENEFICIARIO:</strong> <span style="text-transform: uppercase;">${nombre}</span></li>
@@ -391,12 +429,10 @@ Devuelve el texto corregido estructurado exactamente así en HTML:
                     <li><strong>PROFESIONAL:</strong> <span style="text-transform: uppercase;">${profesional}</span></li>
                 </ul>
 
-                <!-- CONTENIDO DEL EDITOR (TESTS, RESULTADOS, ETC) -->
                 <div class="contenido-quill" style="line-height: 1.6; padding-left: 15px; padding-right: 15px;">
                     ${quillEditor.root.innerHTML} 
                 </div>
 
-                <!-- ROTULO INFERIOR (PIE DE PÁGINA) -->
                 <div style="position: absolute; bottom: 0; left: 0; right: 0; font-family: Arial, sans-serif;">
                     <div style="display:flex; justify-content:center; gap: 40px; font-size: 11px; color: #1a2a6c; margin-bottom: 8px;">
                         <div><span style="font-size:13px;">🌐</span> www.esencialsalud.com.ar</div>
@@ -412,15 +448,16 @@ Devuelve el texto corregido estructurado exactamente así en HTML:
 
             const opciones = {
                 margin:       [0, 0, 0, 0],
-                filename:     `Informe_Trimestral_${nombre.replace(/\s+/g, '_')}.pdf`,
+                filename:     `Informe_${textoTipoInforme.replace(/\s+/g, '_')}_${nombre.replace(/\s+/g, '_')}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             html2pdf().set(opciones).from(elementoTemporal).save().then(() => {
-                db.ref('informes_trimestrales/' + nombre).push({
+                db.ref('historial_informes/' + nombre).push({
                     fecha: Date.now(),
+                    tipo: textoTipoInforme,
                     area: area,
                     profesional: profesional,
                     contenidoHTML: quillEditor.root.innerHTML,
@@ -430,24 +467,36 @@ Devuelve el texto corregido estructurado exactamente así en HTML:
                     alert("El PDF se descargó, pero hubo un error al guardar en la nube: " + err.message);
                 });
             });
-        } // <--- ESTA ERA LA LLAVE QUE FALTABA
+        }
 
-        // ============================================================
-        // 5. GUARDAR BORRADOR RÁPIDO EN NUBE
-        // ============================================================
+        function textoType(t) {
+            return t;
+        }
+
         function guardarBorrador() {
             const nombre = document.getElementById('paciente-select').value;
             if (!nombre) return;
             
-            db.ref('borradores_trimestrales/' + nombre).set({
+            const tipo = document.getElementById('tipo-informe').value;
+            let datosBorrador = {
+                tipoInforme: tipo,
                 area: document.getElementById('area-rep').value,
                 profesional: document.getElementById('profesional-rep').value,
-                test: document.getElementById('test-admin').value,
-                resultados: document.getElementById('resultados').value,
-                sintesis: document.getElementById('sintesis').value,
-                sugerencias: document.getElementById('sugerencias').value,
                 timestamp: Date.now()
-            }).then(() => alert("Borrador parcial guardado en la nube."));
+            };
+
+            if (tipo.startsWith('trimestral')) {
+                datosBorrador.test = document.getElementById('test-admin').value;
+                datosBorrador.resultados = document.getElementById('resultados').value;
+                datosBorrador.sintesis = document.getElementById('sintesis').value;
+                datosBorrador.sugerencias = document.getElementById('sugerencias').value;
+            } else {
+                datosBorrador.resultados = document.getElementById('resultados').value;
+                datosBorrador.sintesis = document.getElementById('sintesis').value;
+            }
+            
+            db.ref('borradores_informes/' + nombre + '/' + tipo).set(datosBorrador)
+              .then(() => alert("Borrador parcial guardado en la nube."));
         }
     </script>
 </body>
