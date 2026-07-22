@@ -227,34 +227,22 @@
             const nombre = select.value;
             const mod = document.getElementById('mod').value;
             const container = document.getElementById('datos-paciente');
-            const infoDiv = document.getElementById('info-paciente');
             
             if (!nombre) { container.style.display = 'none'; return; }
             
             document.getElementById('nombre-paciente').textContent = nombre;
+            document.getElementById('manual-nombre').value = nombre;
             container.style.display = 'block';
-            infoDiv.innerHTML = '<div class="loading">Cargando datos...</div>';
             
-            db.ref(mod + '/pacientes/' + nombre).once('value', snap => {
-                const datos = snap.val();
-                datosPacienteCompleto = datos || {};
+            // Ruta corregida: modulon/paciente/nombre
+            db.ref(mod + '/paciente/' + nombre).once('value', snap => {
+                const datos = snap.val() || {};
+                datosPacienteCompleto = datos;
                 
-                let html = '<table style="width:100%; border-collapse:collapse; font-size:12px;">';
-                const campos = [
-                    { label: '📅 CUD', key: 'cud' },
-                    { label: '🏠 Domicilio', key: 'domicilio' },
-                    { label: '📋 Diagnóstico', key: 'diagnostico' }
-                ];
-                
-                campos.forEach(c => {
-                    if (datos && datos[c.key]) {
-                        html += `<tr><td style="padding:4px 8px; font-weight:600; width:120px;">${c.label}</td><td>${datos[c.key]}</td></tr>`;
-                    }
-                });
-                infoDiv.innerHTML = html + '</table>';
-
-                quillEditor.root.innerHTML = '';
-                limpiarCamposFormulario();
+                // Mapeo exacto con los nombres de campos de tu Firebase
+                document.getElementById('manual-nacimiento').value = datos.nac || '';
+                document.getElementById('manual-edad').value = datos.edad || '';
+                document.getElementById('manual-diagnostico').value = datos.diag || '';
             });
         }
 
@@ -313,44 +301,53 @@
                 `;
             }
         }
-
-        async function generarBorradorIA() {
+async function generarBorradorIA() {
             const nombre = document.getElementById('paciente-select').value;
             if (!nombre) return alert("Seleccioná un paciente primero");
             
             const btn = document.getElementById('btn-ia');
             btn.disabled = true;
-            btn.textContent = '⏳ Corrigiendo ortografía y concordancia...';
+            btn.textContent = '⏳ Redactando, mejorando concordancia y corrigiendo...';
             
             try {
                 const tipo = document.getElementById('tipo-informe').value;
+                let textoAProcesar = '';
                 let promptParts = '';
                 
-                if (tipo.startsWith('trimestral')) {
-                    const test = document.getElementById('test-admin').value;
-                    const resultados = document.getElementById('resultados').value;
-                    const sintesis = document.getElementById('sintesis').value;
-                    const sugerencias = document.getElementById('sugerencias').value;
+                // Verificamos si es un informe trimestral o común para capturar sus valores
+                if (tipo.toLowerCase().includes('trimestral') || tipo.toLowerCase().includes('trimestre')) {
+                    const test = document.getElementById('test-admin').value || '';
+                    const resultados = document.getElementById('resultados').value || '';
+                    const sintesis = document.getElementById('sintesis').value || '';
+                    const sugerencias = document.getElementById('sugerencias').value || '';
+                    
+                    textoAProcesar = `TEST ADMINISTRADOS:\n${test}\n\nRESULTADOS OBTENIDOS E INTERPRETACIÓN:\n${resultados}\n\sSÍNTESIS Y CONCLUSIONES:\n${sintesis}\n\nSUGERENCIAS:\n${sugerencias}`;
                     
                     promptParts = `
                         <p><strong>TEST ADMINISTRADOS:</strong><br>${test}</p><br>
                         <p><strong>RESULTADOS OBTENIDOS E INTERPRETACIÓN DE TEST ADMINISTRADOS:</strong><br>${resultados}</p><br>
                         <p><strong>SÍNTESIS Y CONCLUSIONES:</strong><br>${sintesis}</p><br>
-                        <p><strong>SUGERENCIAS ESCUELA REGULAR:</strong><br>${sugerencias}</p>
+                        <p><strong>SUGERENCIAS ESCUELA REGULAR / FAMILIA:</strong><br>${sugerencias}</p>
                     `;
                 } else {
-                    const resultados = document.getElementById('resultados').value;
-                    const sintesis = document.getElementById('sintesis').value;
+                    const resultados = document.getElementById('resultados').value || '';
+                    const sintesis = document.getElementById('sintesis').value || '';
+                    
+                    textoAProcesar = `DESARROLLO / RESULTADOS:\n${resultados}\n\nSÍNTESIS Y PLANIFICACIÓN:\n${sintesis}`;
+                    
                     promptParts = `
-                        <p><strong>DESARROLLO / RESULTADOS:</strong><br>${resultados}</p><br>
-                        <p><strong>SÍNTESIS Y PLANIFICACIÓN:</strong><br>${sintesis}</p>
+                        <p><strong>DESARROLLO / RESULTADOS / EVALUACIÓN:</strong><br>${resultados}</p><br>
+                        <p><strong>SÍNTESIS Y PLANIFICACIÓN / OBJETIVOS:</strong><br>${sintesis}</p>
                     `;
                 }
 
-                const prompt = `Actúa como un corrector ortotipográfico estricto. Señala repeticiones y errores de puntuación, pero no cambies ni una sola palabra de mi estilo narrativo. I want you to only correct commas and spelling errors, but never write a single syllable nueva que no esté en el original.
+                // NUEVO PROMPT POTENTE: Acá le exigimos que mejore redacción, conectores, concordancia y ortografía sin perder tu sentido clínico.
+                const prompt = `Actúa como un redactor, corrector estilístico y profesional experto en informes clínicos y educativos. 
+                Toma el siguiente texto en bruto que escribió el profesional y **reescríbelo mejorando sustancialmente la redacción, la concordancia gramatical, los nexos de unión entre oraciones y la puntuación**, corrigiendo cualquier error ortográfico o frase cortada. 
+                No inventes diagnósticos ni cambies los datos técnicos o clínicos provistos, pero haz que suene sumamente profesional, fluido, coherente y bien estructurado.
 
-Devuelve el texto corregido estructurado exactamente así en HTML:
-${promptParts}`;
+                Devuelve el resultado estrictamente formateado respetando estas etiquetas HTML y reemplazando el contenido interno con tu versión mejorada:
+                ${promptParts}`;
                 
                 const respuesta = await fetch('https://api.deepseek.com/chat/completions', {
                     method: 'POST',
@@ -361,7 +358,7 @@ ${promptParts}`;
                     body: JSON.stringify({
                         model: 'deepseek-chat',
                         messages: [{ role: 'user', content: prompt }],
-                        temperature: 0.1
+                        temperature: 0.3 // Un toque más de flexibilidad para que redacte con fluidez
                     })
                 });
                 
@@ -372,20 +369,22 @@ ${promptParts}`;
                 const data = await respuesta.json();
                 let htmlGenerado = data.choices[0].message.content;
                 
-                htmlGenerado = htmlGenerado.replace(/```html/g, '').replace(/```/g, '');
+                // Limpiamos si la IA devuelve bloques markdown de código
+                htmlGenerado = htmlGenerado.replace(/```html/g, '').replace(/```/g, '').trim();
+                
                 quillEditor.clipboard.dangerouslyPasteHTML(htmlGenerado);
+                alert("¡Informe redactado, corregido y mejorado con éxito en el editor!");
                 
             } catch(e) {
                 console.error("Error en conexión con DeepSeek:", e);
                 alert("Hubo un error con la corrección IA. Se pasará el texto tal cual al editor.");
-                quillEditor.clipboard.dangerouslyPasteHTML(quillEditor.root.innerHTML);
             }
             
             btn.disabled = false;
-            btn.textContent = '🤖 CORREGIR ORTOGRAFÍA Y PASAR AL EDITOR';
+            btn.textContent = '🤖 REDACTAR, CORREGIR Y PASAR AL EDITOR';
         }
 
-        function exportarPDF() {
+   async function exportarPDF() {
             const nombre = document.getElementById('paciente-select').value;
             if (!nombre) return alert("Selecciona un paciente.");
             
@@ -405,8 +404,12 @@ ${promptParts}`;
             elementoTemporal.style.fontFamily = "'Times New Roman', Times, serif"; 
             elementoTemporal.style.fontSize = "14px";
             elementoTemporal.style.padding = "40px";
-            elementoTemporal.style.position = "relative";
-            elementoTemporal.style.minHeight = "1050px";
+            elementoTemporal.style.position = "absolute";
+            elementoTemporal.style.left = "-9999px"; // Lo ocultamos fuera de la pantalla
+            elementoTemporal.style.top = "0";
+            elementoTemporal.style.width = "210mm"; // Ancho exacto de A4
+            elementoTemporal.style.backgroundColor = "#ffffff";
+            elementoTemporal.style.boxSizing = "border-box";
             
             elementoTemporal.innerHTML = `
                 <div style="display: flex; align-items: flex-end; margin-bottom: 40px;">
@@ -429,11 +432,11 @@ ${promptParts}`;
                     <li><strong>PROFESIONAL:</strong> <span style="text-transform: uppercase;">${profesional}</span></li>
                 </ul>
 
-                <div class="contenido-quill" style="line-height: 1.6; padding-left: 15px; padding-right: 15px;">
+                <div class="contenido-quill" style="line-height: 1.6; padding-left: 15px; padding-right: 15px; margin-bottom: 80px;">
                     ${quillEditor.root.innerHTML} 
                 </div>
 
-                <div style="position: absolute; bottom: 0; left: 0; right: 0; font-family: Arial, sans-serif;">
+                <div style="margin-top: 40px; font-family: Arial, sans-serif;">
                     <div style="display:flex; justify-content:center; gap: 40px; font-size: 11px; color: #1a2a6c; margin-bottom: 8px;">
                         <div><span style="font-size:13px;">🌐</span> www.esencialsalud.com.ar</div>
                         <div><span style="font-size:13px;">📞</span> 4323086 / 4210238</div>
@@ -446,15 +449,21 @@ ${promptParts}`;
                 </div>
             `;
 
+            // ¡Fundamental! Lo agregamos temporalmente al DOM para que html2canvas pueda leerlo
+            document.body.appendChild(elementoTemporal);
+
             const opciones = {
-                margin:       [0, 0, 0, 0],
+                margin:       [10, 10, 10, 10],
                 filename:     `Informe_${textoTipoInforme.replace(/\s+/g, '_')}_${nombre.replace(/\s+/g, '_')}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
+                html2canvas:  { scale: 2, useCORS: true, logging: true },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             html2pdf().set(opciones).from(elementoTemporal).save().then(() => {
+                // Limpiamos eliminando el elemento temporal del DOM
+                document.body.removeChild(elementoTemporal);
+
                 db.ref('historial_informes/' + nombre).push({
                     fecha: Date.now(),
                     tipo: textoTipoInforme,
@@ -464,8 +473,14 @@ ${promptParts}`;
                     modulo: document.getElementById('mod').value
                 }).catch(err => {
                     console.error("Error al guardar en Firebase:", err);
-                    alert("El PDF se descargó, pero hubo un error al guardar en la nube: " + err.message);
                 });
+            }).catch(err => {
+                // Si ocurre un error, nos aseguramos de removerlo igual para no ensuciar la página
+                if (document.body.contains(elementoTemporal)) {
+                    document.body.removeChild(elementoTemporal);
+                }
+                console.error("Error al generar PDF:", err);
+                alert("Hubo un error al generar el PDF: " + err.message);
             });
         }
 
