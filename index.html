@@ -119,7 +119,7 @@
             </div>
 
             <div style="display:flex; gap:10px; margin-top:15px; margin-bottom: 25px;">
-                <button onclick="generarBorradorIA()" style="flex:1; background:#10b981;">🤖 CORREGIR ORTOGRAFÍA Y PASAR AL EDITOR</button>
+                <button id="btn-ia" onclick="generarBorradorIA()" style="flex:1; background:#10b981;">🤖 CORREGIR ORTOGRAFÍA Y PASAR AL EDITOR</button>
                 <button onclick="guardarBorrador()" style="flex:1; background:#8b5cf6;">💾 GUARDAR PARCIAL EN NUBE</button>
             </div>
 
@@ -171,7 +171,7 @@
                         ['bold', 'italic', 'underline', 'strike'],
                         [{ 'color': [] }, { 'background': [] }],
                         [{ 'align': [] }, { 'list': 'ordered'}, { 'list': 'bullet' }],
-                        ['image'], // Botón para insertar imágenes (firmas/sellos)
+                        ['image'],
                         ['clean']
                     ]
                 },
@@ -269,7 +269,6 @@
                 });
                 infoDiv.innerHTML = html + '</table>';
 
-                // Limpiar editor y campos al cambiar paciente
                 quillEditor.root.innerHTML = '';
                 document.getElementById('test-admin').value = '';
                 document.getElementById('resultados').value = '';
@@ -285,7 +284,7 @@
             const nombre = document.getElementById('paciente-select').value;
             if (!nombre) return alert("Seleccioná un paciente primero");
             
-            const btn = event.target;
+            const btn = document.getElementById('btn-ia'); // CORRECCIÓN AQUÍ
             btn.disabled = true;
             btn.textContent = '⏳ Corrigiendo ortografía y concordancia...';
             
@@ -295,8 +294,8 @@
                 const sintesis = document.getElementById('sintesis').value;
                 const sugerencias = document.getElementById('sugerencias').value;
                 
-                // INSTRUCCIÓN ESTRICTA BASADA EN TU ESTILO
-                const prompt = `Actúa como un corrector ortotipográfico estricto. Señala repeticiones y errores de puntuación, corrige solo comas y errores ortográficos de los siguientes textos, pero no cambies ni una sola palabra del estilo narrativo. Nunca escribas ni una sola sílaba nueva que no esté en el original.
+                // INSTRUCCIÓN ESTRICTA
+                const prompt = `Actúa como un corrector ortotipográfico estricto. Señala repeticiones y errores de puntuación, pero no cambies ni una sola palabra de mi estilo narrativo. I want you to only correct commas and spelling errors, but never write a single syllable nueva que no esté en el original.
 
 Devuelve el texto corregido estructurado exactamente así en HTML:
 <p><strong>TEST ADMINISTRADOS:</strong><br>${test}</p><br>
@@ -304,7 +303,8 @@ Devuelve el texto corregido estructurado exactamente así en HTML:
 <p><strong>SÍNTESIS Y CONCLUSIONES:</strong><br>${sintesis}</p><br>
 <p><strong>SUGERENCIAS ESCUELA REGULAR:</strong><br>${sugerencias}</p>`;
                 
-                const respuesta = await fetch('https://api.deepseek.com/v1/chat/completions', {
+                // CORRECCIÓN URL Y PETICIÓN
+                const respuesta = await fetch('https://api.deepseek.com/chat/completions', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -313,11 +313,13 @@ Devuelve el texto corregido estructurado exactamente así en HTML:
                     body: JSON.stringify({
                         model: 'deepseek-chat',
                         messages: [{ role: 'user', content: prompt }],
-                        temperature: 0.1 // Temperatura baja para que no invente nada
+                        temperature: 0.1
                     })
                 });
                 
-                if (!respuesta.ok) throw new Error("Fallo en IA");
+                if (!respuesta.ok) {
+                    throw new Error(`Fallo en IA: ${respuesta.status} ${respuesta.statusText}`);
+                }
                 
                 const data = await respuesta.json();
                 let htmlGenerado = data.choices[0].message.content;
@@ -326,6 +328,7 @@ Devuelve el texto corregido estructurado exactamente así en HTML:
                 quillEditor.clipboard.dangerouslyPasteHTML(htmlGenerado);
                 
             } catch(e) {
+                console.error("Error en conexión con DeepSeek:", e);
                 alert("Hubo un error con la corrección IA. Se pasará el texto tal cual al editor.");
                 const htmlEmergencia = `
                     <p><strong>TEST ADMINISTRADOS:</strong><br>${document.getElementById('test-admin').value}</p><br>
@@ -350,22 +353,19 @@ Devuelve el texto corregido estructurado exactamente así en HTML:
             const area = document.getElementById('area-rep').value || '_________________';
             const profesional = document.getElementById('profesional-rep').value || '_________________';
             
-            // Datos automáticos
             const anioActual = new Date().getFullYear();
             const fechaHoy = new Date().toLocaleDateString('es-AR');
             
-            // Buscar datos de Firebase. Si no existen, pone S/D
             const fechaNac = datosPacienteCompleto.nacimiento || datosPacienteCompleto.nac || datosPacienteCompleto.fechaNacimiento || 'S/D';
             const edad = datosPacienteCompleto.edad || 'S/D';
             const diagnostico = datosPacienteCompleto.diagnostico || datosPacienteCompleto.diag || 'S/D';
             
             const elementoTemporal = document.createElement('div');
-            // Tamaño de fuente general y tipografía formal
             elementoTemporal.style.fontFamily = "'Times New Roman', Times, serif"; 
             elementoTemporal.style.fontSize = "14px";
             elementoTemporal.style.padding = "40px";
             elementoTemporal.style.position = "relative";
-            elementoTemporal.style.minHeight = "1050px"; // Fuerza el tamaño A4 para que el pie quede abajo
+            elementoTemporal.style.minHeight = "1050px";
             
             elementoTemporal.innerHTML = `
                 <!-- ROTULO SUPERIOR -->
@@ -411,7 +411,7 @@ Devuelve el texto corregido estructurado exactamente así en HTML:
             `;
 
             const opciones = {
-                margin:       [0, 0, 0, 0], // Sin márgenes en html2pdf para que el pie de página llegue a los bordes
+                margin:       [0, 0, 0, 0],
                 filename:     `Informe_Trimestral_${nombre.replace(/\s+/g, '_')}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true },
@@ -419,7 +419,6 @@ Devuelve el texto corregido estructurado exactamente así en HTML:
             };
 
             html2pdf().set(opciones).from(elementoTemporal).save().then(() => {
-                // Usamos la ruta correcta 'informes_trimestrales'
                 db.ref('informes_trimestrales/' + nombre).push({
                     fecha: Date.now(),
                     area: area,
@@ -431,6 +430,7 @@ Devuelve el texto corregido estructurado exactamente así en HTML:
                     alert("El PDF se descargó, pero hubo un error al guardar en la nube: " + err.message);
                 });
             });
+        } // <--- ESTA ERA LA LLAVE QUE FALTABA
 
         // ============================================================
         // 5. GUARDAR BORRADOR RÁPIDO EN NUBE
