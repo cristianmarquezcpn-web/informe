@@ -221,8 +221,7 @@
                 select.innerHTML = '<option value="">❌ Error al cargar pacientes</option>';
             });
         }
-
-        function cargarDatosPaciente() {
+function cargarDatosPaciente() {
             const select = document.getElementById('paciente-select');
             const nombre = select.value;
             const mod = document.getElementById('mod').value;
@@ -231,21 +230,16 @@
             if (!nombre) { container.style.display = 'none'; return; }
             
             document.getElementById('nombre-paciente').textContent = nombre;
-            document.getElementById('manual-nombre').value = nombre;
             container.style.display = 'block';
             
-            // Ruta corregida: modulon/paciente/nombre
+            // Ruta de Firebase: módulo/paciente/nombre
             db.ref(mod + '/paciente/' + nombre).once('value', snap => {
                 const datos = snap.val() || {};
-                datosPacienteCompleto = datos;
-                
-                // Mapeo exacto con los nombres de campos de tu Firebase
-                document.getElementById('manual-nacimiento').value = datos.nac || '';
-                document.getElementById('manual-edad').value = datos.edad || '';
-                document.getElementById('manual-diagnostico').value = datos.diag || '';
+                datosPacienteCompleto = datos; // Almacenamos el objeto completo (con 'nac', 'edad', 'diag') para usarlo al exportar el PDF
+            }, error => {
+                console.error("Error al leer de Firebase:", error);
             });
         }
-
         function limpiarCamposFormulario() {
             const ids = ['test-admin', 'resultados', 'sintesis', 'sugerencias', 'objetivos', 'evaluacion', 'estrategias', 'evolucion'];
             ids.forEach(id => {
