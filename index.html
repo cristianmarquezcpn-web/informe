@@ -419,16 +419,18 @@ Devuelve el texto corregido estructurado exactamente así en HTML:
             };
 
             html2pdf().set(opciones).from(elementoTemporal).save().then(() => {
-                // Guardamos la sección del profesional en la base de datos para unirlos después en el semestral
+                // Usamos la ruta correcta 'informes_trimestrales'
                 db.ref('informes_trimestrales/' + nombre).push({
                     fecha: Date.now(),
                     area: area,
                     profesional: profesional,
                     contenidoHTML: quillEditor.root.innerHTML,
                     modulo: document.getElementById('mod').value
+                }).catch(err => {
+                    console.error("Error al guardar en Firebase:", err);
+                    alert("El PDF se descargó, pero hubo un error al guardar en la nube: " + err.message);
                 });
             });
-        }
 
         // ============================================================
         // 5. GUARDAR BORRADOR RÁPIDO EN NUBE
