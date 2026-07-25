@@ -25,7 +25,6 @@
         button:hover { background: #3b82f6; transform: scale(1.01); }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .loading { text-align: center; padding: 20px; color: #64748b; }
         .stats { display: flex; gap: 10px; margin: 10px 0; flex-wrap: wrap; }
         .stat-item { background: #e2e8f0; padding: 8px 15px; border-radius: 8px; font-size: 12px; }
         
@@ -97,7 +96,7 @@
                 </div>
                 <div>
                     <label><b>● ÁREA:</b></label>
-                    <select id="area-rep">
+                    <select id="area-rep" onchange="cargarInformeArea()">
                         <option value="Psicología">Psicología</option>
                         <option value="Psicopedagogía">Psicopedagogía</option>
                         <option value="Kinesiología">Kinesiología</option>
@@ -106,6 +105,14 @@
                         <option value="Trabajo Social">Trabajo Social</option>
                     </select>
                 </div>
+            </div>
+
+            <!-- HERRAMIENTA PARA COPIAR DE OTRO INFORME O UNIFICAR -->
+            <div style="margin-top:15px; background: #e0f2fe; padding: 12px; border-radius: 8px; border: 1px solid #bae6fd;">
+                <label style="color: #0369a1;"><b>🔄 COPIAR DATOS DE UN INFORME ANTERIOR O OTRA ÁREA:</b></label>
+                <select id="select-copiar-previo" onchange="copiarDatosInformePrevio()" style="margin-top:5px; background: white;">
+                    <option value="">Selecciona un informe previo para autocompletar...</option>
+                </select>
             </div>
 
             <div style="margin-top:15px;">
@@ -133,7 +140,7 @@
             <div id="editor-container"></div>
             
             <button onclick="exportarPDF()" style="margin-top: 20px; font-size: 16px; padding: 15px; background: #2563eb;">
-                📄 DESCARGAR INFORME PDF FINAL
+                📄 DESCARGAR INFORME PDF FINAL Y GUARDAR POR ÁREA
             </button>
         </div>
     </div>
@@ -155,6 +162,7 @@
         let pacienteActual = null;
         let datosPacienteCompleto = {};
         let quillEditor;
+        let historialesPacienteCache = {};
 
         window.onload = function() {
             quillEditor = new Quill('#editor-container', {
@@ -221,7 +229,8 @@
                 select.innerHTML = '<option value="">❌ Error al cargar pacientes</option>';
             });
         }
-function cargarDatosPaciente() {
+
+        function cargarDatosPaciente() {
             const select = document.getElementById('paciente-select');
             const nombre = select.value;
             const mod = document.getElementById('mod').value;
@@ -232,16 +241,68 @@ function cargarDatosPaciente() {
             document.getElementById('nombre-paciente').textContent = nombre;
             container.style.display = 'block';
             
-            // Ruta de Firebase: módulo/paciente/nombre
             db.ref(mod + '/paciente/' + nombre).once('value', snap => {
-                const datos = snap.val() || {};
-                datosPacienteCompleto = datos; // Almacenamos el objeto completo (con 'nac', 'edad', 'diag') para usarlo al exportar el PDF
-            }, error => {
-                console.error("Error al leer de Firebase:", error);
+                datosPacienteCompleto = snap.val() || {};
+            });
+
+            // Cargar historial de informes de este paciente para permitir reutilizar/copiar
+            db.ref('historial_informes/' + nombre).once('value', snap => {
+                historialesPacienteCache = {};
+                const selectCopiar = document.getElementById('select-copiar-previo');
+                selectCopiar.innerHTML = '<option value="">Selecciona un informe previo para autocompletar...</option>';
+                
+                snap.forEach(child => {
+                    const inf = child.val();
+                    const key = child.key;
+                    historialesPacienteCache[key] = inf;
+                    
+                    const opt = document.createElement('option');
+                    opt.value = key;
+                    opt.textContent = `[${inf.area}] - ${inf.tipo} (${new Date(inf.fecha).toLocaleDateString()})`;
+                    selectCopiar.appendChild(opt);
+                });
+            });
+
+            cargarInformeArea();
+        }
+
+        function cargarInformeArea() {
+            const nombre = document.getElementById('paciente-select').value;
+            const tipo = document.getElementById('tipo-informe').value;
+            const area = document.getElementById('area-rep').value;
+            if (!nombre) return;
+
+            // Intentar cargar borrador guardado previamente para esta área y tipo
+            db.ref('borradores_informes/' + nombre + '/' + area + '/' + tipo).once('value', snap => {
+                const b = snap.val();
+                limpiarCamposFormulario();
+                if (b) {
+                    if(document.getElementById('test-admin')) document.getElementById('test-admin').value = b.test || '';
+                    if(document.getElementById('resultados')) document.getElementById('resultados').value = b.resultados || '';
+                    if(document.getElementById('sintesis')) document.getElementById('sintesis').value = b.sintesis || '';
+                    if(document.getElementById('sugerencias')) document.getElementById('sugerencias').value = b.sugerencias || '';
+                    if(b.profesional) document.getElementById('profesional-rep').value = b.profesional;
+                }
             });
         }
+
+        function copiarDatosInformePrevio() {
+            const key = document.getElementById('select-copiar-previo').value;
+            if (!key || !historialesPacienteCache[key]) return;
+            
+            const inf = historialesPacienteCache[key];
+            if(document.getElementById('area-rep')) document.getElementById('area-rep').value = inf.area || document.getElementById('area-rep').value;
+            if(document.getElementById('profesional-rep')) document.getElementById('profesional-rep').value = inf.profesional || '';
+            
+            // Si el contenido HTML anterior se quiere pasar al editor principal
+            if(inf.contenidoHTML) {
+                quillEditor.clipboard.dangerouslyPasteHTML(inf.contenidoHTML);
+            }
+            alert("¡Datos del informe previo cargados correctamente en el formulario/editor!");
+        }
+
         function limpiarCamposFormulario() {
-            const ids = ['test-admin', 'resultados', 'sintesis', 'sugerencias', 'objetivos', 'evaluacion', 'estrategias', 'evolucion'];
+            const ids = ['test-admin', 'resultados', 'sintesis', 'sugerencias'];
             ids.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.value = '';
@@ -294,8 +355,10 @@ function cargarDatosPaciente() {
                     </div>
                 `;
             }
+            cargarInformeArea();
         }
-async function generarBorradorIA() {
+
+        async function generarBorradorIA() {
             const nombre = document.getElementById('paciente-select').value;
             if (!nombre) return alert("Seleccioná un paciente primero");
             
@@ -305,17 +368,13 @@ async function generarBorradorIA() {
             
             try {
                 const tipo = document.getElementById('tipo-informe').value;
-                let textoAProcesar = '';
                 let promptParts = '';
                 
-                // Verificamos si es un informe trimestral o común para capturar sus valores
                 if (tipo.toLowerCase().includes('trimestral') || tipo.toLowerCase().includes('trimestre')) {
                     const test = document.getElementById('test-admin').value || '';
                     const resultados = document.getElementById('resultados').value || '';
                     const sintesis = document.getElementById('sintesis').value || '';
                     const sugerencias = document.getElementById('sugerencias').value || '';
-                    
-                    textoAProcesar = `TEST ADMINISTRADOS:\n${test}\n\nRESULTADOS OBTENIDOS E INTERPRETACIÓN:\n${resultados}\n\sSÍNTESIS Y CONCLUSIONES:\n${sintesis}\n\nSUGERENCIAS:\n${sugerencias}`;
                     
                     promptParts = `
                         <p><strong>TEST ADMINISTRADOS:</strong><br>${test}</p><br>
@@ -327,15 +386,12 @@ async function generarBorradorIA() {
                     const resultados = document.getElementById('resultados').value || '';
                     const sintesis = document.getElementById('sintesis').value || '';
                     
-                    textoAProcesar = `DESARROLLO / RESULTADOS:\n${resultados}\n\nSÍNTESIS Y PLANIFICACIÓN:\n${sintesis}`;
-                    
                     promptParts = `
                         <p><strong>DESARROLLO / RESULTADOS / EVALUACIÓN:</strong><br>${resultados}</p><br>
                         <p><strong>SÍNTESIS Y PLANIFICACIÓN / OBJETIVOS:</strong><br>${sintesis}</p>
                     `;
                 }
 
-                // NUEVO PROMPT POTENTE: Acá le exigimos que mejore redacción, conectores, concordancia y ortografía sin perder tu sentido clínico.
                 const prompt = `Actúa como un redactor, corrector estilístico y profesional experto en informes clínicos y educativos. 
                 Toma el siguiente texto en bruto que escribió el profesional y **reescríbelo mejorando sustancialmente la redacción, la concordancia gramatical, los nexos de unión entre oraciones y la puntuación**, corrigiendo cualquier error ortográfico o frase cortada. 
                 No inventes diagnósticos ni cambies los datos técnicos o clínicos provistos, pero haz que suene sumamente profesional, fluido, coherente y bien estructurado.
@@ -352,7 +408,7 @@ async function generarBorradorIA() {
                     body: JSON.stringify({
                         model: 'deepseek-v4-pro',
                         messages: [{ role: 'user', content: prompt }],
-                        temperature: 0.3 // Un toque más de flexibilidad para que redacte con fluidez
+                        temperature: 0.3
                     })
                 });
                 
@@ -362,8 +418,6 @@ async function generarBorradorIA() {
                 
                 const data = await respuesta.json();
                 let htmlGenerado = data.choices[0].message.content;
-                
-                // Limpiamos si la IA devuelve bloques markdown de código
                 htmlGenerado = htmlGenerado.replace(/```html/g, '').replace(/```/g, '').trim();
                 
                 quillEditor.clipboard.dangerouslyPasteHTML(htmlGenerado);
@@ -375,17 +429,17 @@ async function generarBorradorIA() {
             }
             
             btn.disabled = false;
-            btn.textContent = '🤖 REDACTAR, CORREGIR Y PASAR AL EDITOR';
+            btn.textContent = '🤖 CORREGIR ORTOGRAFÍA Y PASAR AL EDITOR';
         }
 
-   async function exportarPDF() {
+        async function exportarPDF() {
             const nombre = document.getElementById('paciente-select').value;
             if (!nombre) return alert("Selecciona un paciente.");
             
             const area = document.getElementById('area-rep').value || '_________________';
             const profesional = document.getElementById('profesional-rep').value || '_________________';
             const tipoInforme = document.getElementById('tipo-informe');
-            const textoTipoInforme = tipoInforme.options[tipoInforme.selectedIndex].text.toUpperCase();
+            const textoTypeVal = tipoInforme.options[tipoInforme.selectedIndex].text.toUpperCase();
             
             const anioActual = new Date().getFullYear();
             const fechaHoy = new Date().toLocaleDateString('es-AR');
@@ -399,9 +453,9 @@ async function generarBorradorIA() {
             elementoTemporal.style.fontSize = "14px";
             elementoTemporal.style.padding = "40px";
             elementoTemporal.style.position = "absolute";
-            elementoTemporal.style.left = "-9999px"; // Lo ocultamos fuera de la pantalla
+            elementoTemporal.style.left = "-9999px";
             elementoTemporal.style.top = "0";
-            elementoTemporal.style.width = "210mm"; // Ancho exacto de A4
+            elementoTemporal.style.width = "210mm";
             elementoTemporal.style.backgroundColor = "#ffffff";
             elementoTemporal.style.boxSizing = "border-box";
             
@@ -412,7 +466,7 @@ async function generarBorradorIA() {
                 </div>
 
                 <div style="text-align: center; font-weight: bold; margin-bottom: 30px; font-size: 15px;">
-                    <div style="text-decoration: underline;">${textoType(textoTipoInforme)}</div>
+                    <div style="text-decoration: underline;">${textoTypeVal}</div>
                     <div style="margin-top: 5px;">${anioActual}</div>
                 </div>
 
@@ -443,33 +497,34 @@ async function generarBorradorIA() {
                 </div>
             `;
 
-            // ¡Fundamental! Lo agregamos temporalmente al DOM para que html2canvas pueda leerlo
             document.body.appendChild(elementoTemporal);
 
             const opciones = {
                 margin:       [10, 10, 10, 10],
-                filename:     `Informe_${textoTipoInforme.replace(/\s+/g, '_')}_${nombre.replace(/\s+/g, '_')}.pdf`,
+                filename:     `Informe_${area}_${textoTypeVal.replace(/\s+/g, '_')}_${nombre.replace(/\s+/g, '_')}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true, logging: true },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             html2pdf().set(opciones).from(elementoTemporal).save().then(() => {
-                // Limpiamos eliminando el elemento temporal del DOM
                 document.body.removeChild(elementoTemporal);
 
-                db.ref('historial_informes/' + nombre).push({
+                // Guardado estructurado por área específica para armar un informe general luego
+                const dataRegistro = {
                     fecha: Date.now(),
-                    tipo: textoTipoInforme,
+                    tipo: textoTypeVal,
                     area: area,
                     profesional: profesional,
                     contenidoHTML: quillEditor.root.innerHTML,
                     modulo: document.getElementById('mod').value
-                }).catch(err => {
-                    console.error("Error al guardar en Firebase:", err);
-                });
+                };
+
+                // Guardar en el historial general y en la subruta específica del área
+                db.ref('historial_informes/' + nombre).push(dataRegistro);
+                db.ref('informes_por_area/' + nombre + '/' + area + '/' + document.getElementById('tipo-informe').value).set(dataRegistro);
+
             }).catch(err => {
-                // Si ocurre un error, nos aseguramos de removerlo igual para no ensuciar la página
                 if (document.body.contains(elementoTemporal)) {
                     document.body.removeChild(elementoTemporal);
                 }
@@ -478,34 +533,32 @@ async function generarBorradorIA() {
             });
         }
 
-        function textoType(t) {
-            return t;
-        }
-
         function guardarBorrador() {
             const nombre = document.getElementById('paciente-select').value;
+            const area = document.getElementById('area-rep').value;
             if (!nombre) return;
             
             const tipo = document.getElementById('tipo-informe').value;
             let datosBorrador = {
                 tipoInforme: tipo,
-                area: document.getElementById('area-rep').value,
+                area: area,
                 profesional: document.getElementById('profesional-rep').value,
                 timestamp: Date.now()
             };
 
             if (tipo.startsWith('trimestral')) {
-                datosBorrador.test = document.getElementById('test-admin').value;
-                datosBorrador.resultados = document.getElementById('resultados').value;
-                datosBorrador.sintesis = document.getElementById('sintesis').value;
-                datosBorrador.sugerencias = document.getElementById('sugerencias').value;
+                datosBorrador.test = document.getElementById('test-admin').value || '';
+                datosBorrador.resultados = document.getElementById('resultados').value || '';
+                datosBorrador.sintesis = document.getElementById('sintesis').value || '';
+                datosBorrador.sugerencias = document.getElementById('sugerencias').value || '';
             } else {
-                datosBorrador.resultados = document.getElementById('resultados').value;
-                datosBorrador.sintesis = document.getElementById('sintesis').value;
+                datosBorrador.resultados = document.getElementById('resultados').value || '';
+                datosBorrador.sintesis = document.getElementById('sintesis').value || '';
             }
             
-            db.ref('borradores_informes/' + nombre + '/' + tipo).set(datosBorrador)
-              .then(() => alert("Borrador parcial guardado en la nube."));
+            // Guardado separado por área y tipo de informe
+            db.ref('borradores_informes/' + nombre + '/' + area + '/' + tipo).set(datosBorrador)
+              .then(() => alert("Borrador parcial guardado en la nube para el área de " + area + "."));
         }
     </script>
 </body>
