@@ -72,6 +72,10 @@
     </div>
 </div>
 
+<div style="margin: 10px 0;">
+    <label style="font-size: 13px; font-weight: bold;">Subir mi Firma y Sello:</label>
+    <input type="file" id="subir-firma" accept="image/*" onchange="cargarFirma(event)">
+</div>
     <div id="app-content" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <h2>📋 Generador de Informes Profesionales</h2>
@@ -493,9 +497,11 @@ async function exportarPDF() {
     const edad = document.getElementById('val-edad').value || 'S/D';
     const diagnostico = document.getElementById('val-diag').value || 'S/D';
     
-    // Creamos un contenedor exclusivo para la impresión nativa
+    // Si tienes un input de tipo file para subir la firma o una variable global con la URL/Base64 de tu firma:
+    // const firmaUrl = window.firmaBase64 || ''; 
+
     const elementoTemporal = document.createElement('div');
-    elementoTemporal.id = 'print-section'; // Asignamos ID para controlarlo por CSS
+    elementoTemporal.id = 'print-section';
     elementoTemporal.style.fontFamily = "'Times New Roman', Times, serif"; 
     elementoTemporal.style.fontSize = "14px";
     elementoTemporal.style.padding = "20px";
@@ -503,9 +509,17 @@ async function exportarPDF() {
     elementoTemporal.style.boxSizing = "border-box";
     
     elementoTemporal.innerHTML = `
-        <div style="display: flex; align-items: flex-end; margin-bottom: 30px;">
-            <h1 style="color: #1a2a6c; margin: 0; font-size: 42px; font-weight: bold; line-height: 0.8; font-family: 'Georgia', serif;">Esencial</h1>
-            <div style="flex-grow: 1; height: 3px; background-color: #1a2a6c; margin-left: 15px; margin-bottom: 6px;"></div>
+        <!-- ENCABEZADO CON FLOR Y LÍNEA -->
+        <div style="display: flex; align-items: center; margin-bottom: 25px;">
+            <div style="display: flex; align-items: baseline;">
+                <!-- Ícono de la flor hecho en SVG fiel al diseño -->
+                <svg width="45" height="45" viewBox="0 0 100 100" style="margin-right: 8px; fill: #1a2a6c;">
+                    <path d="M50 30 C 40 10, 20 20, 30 40 C 10 40, 10 60, 30 60 C 20 80, 40 90, 50 70 C 60 90, 80 80, 70 60 C 90 60, 90 40, 70 40 C 80 20, 60 10, 50 30 Z" />
+                    <circle cx="50" cy="50" r="12" fill="#ffffff"/>
+                </svg>
+                <h1 style="color: #1a2a6c; margin: 0; font-size: 42px; font-weight: bold; line-height: 0.8; font-family: 'Georgia', serif;">Esencial</h1>
+            </div>
+            <div style="flex-grow: 1; height: 3px; background-color: #1a2a6c; margin-left: 20px;"></div>
         </div>
 
         <div style="text-align: center; font-weight: bold; margin-bottom: 25px; font-size: 15px;">
@@ -523,10 +537,26 @@ async function exportarPDF() {
             <li><strong>PROFESIONAL / RESPONSABLE:</strong> <span style="text-transform: uppercase;">${profesional}</span></li>
         </ul>
 
-        <div class="contenido-quill" style="line-height: 1.6; padding-left: 10px; padding-right: 10px; margin-bottom: 60px;">
+        <div class="contenido-quill" style="line-height: 1.6; padding-left: 10px; padding-right: 10px; margin-bottom: 40px;">
             ${quillEditor.root.innerHTML} 
         </div>
 
+        <!-- ESPACIO DE FIRMA Y SELLO -->
+        <div style="margin-top: 50px; display: flex; justify-content: flex-end; page-break-inside: avoid;">
+            <div style="text-align: center; width: 250px;">
+                <!-- Contenedor de la firma (puedes ajustar el ancho con px) -->
+                <div style="height: 70px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">
+                    <!-- Si el usuario cargó firma, se muestra aquí. Si no, queda el espacio -->
+                    <div id="espacio-firma-render"></div>
+                </div>
+                <div style="border-top: 1px solid #000000; padding-top: 5px; font-size: 12px; font-weight: bold; text-transform: uppercase;">
+                    ${profesional}
+                </div>
+                <div style="font-size: 11px; color: #555;">Firma y Sello Profesional</div>
+            </div>
+        </div>
+
+        <!-- PIE DE PÁGINA -->
         <div style="margin-top: 40px; font-family: Arial, sans-serif;">
             <div style="display:flex; justify-content:center; gap: 40px; font-size: 11px; color: #1a2a6c; margin-bottom: 8px;">
                 <div>🌐 www.esencialsalud.com.ar</div>
@@ -540,13 +570,18 @@ async function exportarPDF() {
         </div>
     `;
 
+    // Si guardaste una imagen de firma en localStorage o en una variable global, la inyectamos:
+    const firmaGuardada = localStorage.getItem('firma_sello_profesional');
+    if (firmaGuardada) {
+        elementoTemporal.querySelector('#espacio-firma-render').innerHTML = `
+            <img src="${firmaGuardada}" style="max-height: 65px; max-width: 200px; object-fit: contain;" />
+        `;
+    }
+
     document.body.appendChild(elementoTemporal);
 
     try {
-        // Disparamos la impresión del navegador (el usuario podrá elegir "Guardar como PDF")
         window.print();
-
-        // Una vez que se cierra o ejecuta la impresión, guardamos en Firebase y limpiamos
         document.body.removeChild(elementoTemporal);
 
         const dataRegistro = {
@@ -561,13 +596,12 @@ async function exportarPDF() {
         db.ref('historial_informes/' + nombre).push(dataRegistro);
         db.ref('informes_por_area/' + nombre + '/' + area + '/' + document.getElementById('tipo-informe').value).set(dataRegistro);
         
-        alert("¡Informe procesado y guardado en el historial con éxito!");
+        alert("¡Informe procesado y guardado con éxito!");
     } catch (err) {
         if (document.body.contains(elementoTemporal)) document.body.removeChild(elementoTemporal);
-        alert("Error al procesar el informe: " + err.message);
+        alert("Error: " + err.message);
     }
 }
-
         function guardarBorrador() {
             const nombre = document.getElementById('paciente-select').value;
             const area = document.getElementById('area-rep').value;
@@ -590,6 +624,18 @@ async function exportarPDF() {
             db.ref('borradores_informes/' + nombre + '/' + area + '/' + tipo).set(datosBorrador)
               .then(() => alert("Borrador guardado correctamente."));
         }
+        
+function cargarFirma(event) {
+    const archivo = event.target.files[0];
+    if (archivo) {
+        const lector = new FileReader();
+        lector.onload = function(e) {
+            localStorage.setItem('firma_sello_profesional', e.target.result);
+            alert("¡Firma y sello guardados correctamente para los próximos informes!");
+        };
+        lector.readAsDataURL(archivo);
+    }
+}
     </script>
 </body>
 </html>
