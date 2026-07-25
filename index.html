@@ -105,6 +105,14 @@
         </button>
     </div>
 </div>
+<!-- Panel para subir el Encabezado / Logo Institucional -->
+<div style="background: #f4f6f9; padding: 15px; border-radius: 8px; margin-top: 15px; font-family: Arial, sans-serif;">
+    <h4 style="margin-top: 0; color: #1a2a6c;">Encabezado / Logo Institucional</h4>
+    <label style="font-size: 12px; font-weight: bold;">Subir imagen del logo o membrete superior:</label><br>
+    <input type="file" id="subir-logo" accept="image/*" onchange="guardarLogoInstitucional(event)">
+</div>
+
+<!-- Panel para subir el Pie de Página Institucional -->
 <div style="background: #f4f6f9; padding: 15px; border-radius: 8px; margin-top: 15px; font-family: Arial, sans-serif;">
     <h4 style="margin-top: 0; color: #1a2a6c;">Pie de Página Institucional</h4>
     <label style="font-size: 12px; font-weight: bold;">Subir imagen del pie (con datos y barra azul):</label><br>
@@ -762,6 +770,20 @@ function insertarSelloSeleccionadoEnQuill() {
 document.addEventListener('DOMContentLoaded', () => {
     actualizarSelectSellos();
 });    
+// Función para guardar el logotipo del encabezado
+function guardarLogoInstitucional(event) {
+    const archivo = event.target.files[0];
+    if (archivo) {
+        const lector = new FileReader();
+        lector.onload = function(e) {
+            localStorage.setItem('logo_institucional_esencial', e.target.result);
+            alert("¡Logo institucional guardado con éxito!");
+        };
+        lector.readAsDataURL(archivo);
+    }
+}
+
+// Función para guardar la imagen del pie de página
 function guardarPieInstitucional(event) {
     const archivo = event.target.files[0];
     if (archivo) {
@@ -772,7 +794,7 @@ function guardarPieInstitucional(event) {
         };
         lector.readAsDataURL(archivo);
     }
-}        
+}       
 </script>
 </body>
 </html>
