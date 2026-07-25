@@ -528,7 +528,7 @@
             btn.disabled = false;
             btn.textContent = '🤖 CORREGIR Y PASAR AL EDITOR';
         }
-   async function exportarPDF() {
+async function exportarPDF() {
     const nombre = document.getElementById('paciente-select').value;
     if (!nombre) return alert("Selecciona un paciente.");
     
@@ -557,13 +557,13 @@
     elementoTemporal.style.boxSizing = "border-box";
     
     elementoTemporal.innerHTML = `
-        <!-- ENCABEZADO INSTITUCIONAL ÚNICO -->
-        <header style="display: flex; align-items: center; margin-bottom: 25px; width: 100%;">
-            <div style="display: flex; align-items: center;">
-                ${logoGuardado ? `<img src="${logoGuardado}" style="height: 45px; object-fit: contain; margin-right: 12px;" />` : ''}
-                <h1 style="color: #1a2a6c; margin: 0; font-size: 38px; font-weight: bold; line-height: 1; font-family: 'Georgia', serif;">Esencial</h1>
+        <!-- ENCABEZADO INSTITUCIONAL -->
+        <header style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; width: 100%; border-bottom: 3px solid #1a2a6c; padding-bottom: 10px;">
+            <div style="display: flex; align-items: center; width: 100%;">
+                ${logoGuardado ? `<img src="${logoGuardado}" style="max-height: 75px; width: auto; object-fit: contain; display: block;" />` : `
+                    <h1 style="color: #1a2a6c; margin: 0; font-size: 38px; font-weight: bold; font-family: 'Georgia', serif;">Esencial</h1>
+                `}
             </div>
-            <div style="flex-grow: 1; height: 3px; background-color: #1a2a6c; margin-left: 20px;"></div>
         </header>
 
         <div style="text-align: center; font-weight: bold; margin-bottom: 25px; font-size: 15px;">
@@ -581,7 +581,7 @@
             <li><strong>PROFESIONAL / RESPONSABLE:</strong> <span style="text-transform: uppercase;">${profesional}</span></li>
         </ul>
 
-        <!-- CUERPO DEL INFORME (SOLO TEXTO DE QUILL) -->
+        <!-- CUERPO DEL INFORME -->
         <div class="contenido-quill" style="line-height: 1.6; padding-left: 10px; padding-right: 10px; margin-bottom: 40px;">
             ${quillEditor.root.innerHTML} 
         </div>
@@ -589,7 +589,6 @@
         <!-- ESPACIO DE FIRMA Y SELLO -->
         <div style="margin-top: 40px; display: flex; justify-content: flex-end; page-break-inside: avoid;">
             <div style="text-align: center; width: 250px;">
-                <!-- Aquí se inyecta el sello arriba de la línea -->
                 <div style="height: 70px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">
                     <div id="espacio-firma-render"></div>
                 </div>
@@ -602,7 +601,7 @@
 
         <!-- PIE DE PÁGINA INSTITUCIONAL FIJO AL FINAL -->
         <footer style="margin-top: 50px; text-align: center; width: 100%;">
-            ${pieGuardado ? `<img src="${pieGuardado}" style="width: 100%; max-height: 60px; object-fit: contain;" />` : `
+            ${pieGuardado ? `<img src="${pieGuardado}" style="width: 100%; max-height: 110px; object-fit: contain; display: block;" />` : `
                 <div style="font-family: Arial, sans-serif; font-size: 10px; color: #1a2a6c;">
                     <div>www.esencialsalud.com.ar | 4323086 / 4210238</div>
                     <div>25 de mayo 30 (E) Ciudad de San Juan</div>
