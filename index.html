@@ -54,7 +54,10 @@
     <div id="app-content" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <h2>📋 Generador de Informes Profesionales</h2>
-            <button onclick="cerrarSesion()" style="width: auto; background: #ef4444; padding: 8px 15px;">Salir</button>
+            <div>
+                <span id="user-email-display" style="font-size: 12px; margin-right: 10px; color: #555;"></span>
+                <button onclick="cerrarSesion()" style="width: auto; background: #ef4444; padding: 8px 15px;">Salir</button>
+            </div>
         </div>
         
         <div class="card">
@@ -76,7 +79,7 @@
             </div>
             
             <div class="stats">
-                <span class="stat-item" id="stats-pacientes">👥 0 pacientes</span>
+                <span class="stat-item" id="stats-pacientes">👥 0 pacientes cargados</span>
             </div>
         </div>
         
@@ -118,7 +121,7 @@
             <div style="margin-top:15px; background: #e0f2fe; padding: 12px; border-radius: 8px; border: 1px solid #bae6fd;">
                 <label style="color: #0369a1;"><b>🔄 COPIAR DATOS DE UN INFORME ANTERIOR:</b></label>
                 <select id="select-copiar-previo" onchange="copiarDatosInformePrevio()" style="margin-top:5px; background: white;">
-                    <option value="">Selecciona un informe previo para autocompletar...</option>
+                    <option value="">(No hay informes previos registrados para este paciente)</option>
                 </select>
             </div>
 
@@ -127,7 +130,6 @@
                 <input type="text" id="profesional-rep" placeholder="Nombre completo del profesional">
             </div>
             
-            <!-- CONTENEDOR DINÁMICO SEGÚN EL MODELO SELECCIONADO -->
             <div id="campos-dinamicos-modelo"></div>
 
             <div style="display:flex; gap:10px; margin-top:20px; margin-bottom: 25px;">
@@ -191,6 +193,7 @@
             if (user) {
                 document.getElementById('login-overlay').style.display = 'none';
                 document.getElementById('app-content').style.display = 'block';
+                document.getElementById('user-email-display').textContent = `👤 ${user.email}`;
                 listarPacientes();
             } else {
                 document.getElementById('login-overlay').style.display = 'flex';
@@ -199,29 +202,42 @@
         });
 
         const provider = new firebase.auth.GoogleAuthProvider();
-        function iniciarSesionGoogle() { auth.signInWithPopup(provider).catch(e => alert(e.message)); }
+        function iniciarSesionGoogle() { auth.signInWithPopup(provider).catch(e => alert("Error de Autenticación: " + e.message)); }
         function cerrarSesion() { auth.signOut(); }
 
         function listarPacientes() {
             const mod = document.getElementById('mod').value;
             const select = document.getElementById('paciente-select');
-            select.innerHTML = '<option value="">⏳ Cargando...</option>';
+            select.innerHTML = '<option value="">⏳ Consultando Firebase...</option>';
             
-            db.ref(mod + '/pacientes').once('value', snap => {
+            // Ruta exacta donde se leen los pacientes
+            const rutaConsulta = mod + '/pacientes';
+            console.log("Consultando Firebase en ruta:", rutaConsulta);
+
+            db.ref(rutaConsulta).once('value', snap => {
                 select.innerHTML = '<option value="">Seleccionar paciente...</option>';
                 let count = 0;
-                snap.forEach(child => {
-                    const pac = child.val();
-                    const nombre = child.key;
-                    if (pac && nombre) {
-                        const opt = document.createElement('option');
-                        opt.value = nombre;
-                        opt.textContent = nombre;
-                        select.appendChild(opt);
-                        count++;
-                    }
-                });
-                document.getElementById('stats-pacientes').textContent = `👥 ${count} pacientes`;
+                
+                if (snap.exists()) {
+                    snap.forEach(child => {
+                        const pac = child.val();
+                        const nombre = child.key;
+                        if (nombre) {
+                            const opt = document.createElement('option');
+                            opt.value = nombre;
+                            opt.textContent = nombre;
+                            select.appendChild(opt);
+                            count++;
+                        }
+                    });
+                } else {
+                    console.warn("No se encontraron registros en la ruta: " + rutaConsulta);
+                }
+                document.getElementById('stats-pacientes').textContent = `👥 ${count} pacientes cargados (${mod.toUpperCase()})`;
+            }, (error) => {
+                console.error("Error al leer Firebase:", error);
+                alert("Error al leer pacientes de Firebase. Verificá tu conexión o las reglas de seguridad.");
+                select.innerHTML = '<option value="">❌ Error al cargar</option>';
             });
         }
 
@@ -237,26 +253,33 @@
             document.getElementById('lbl-nombre').textContent = nombre;
             container.style.display = 'block';
             
-            db.ref(mod + '/paciente/' + nombre).once('value', snap => {
+            // Cargar datos demográficos del paciente
+            db.ref(mod + '/pacientes/' + nombre).once('value', snap => {
                 datosPacienteCompleto = snap.val() || {};
                 document.getElementById('val-nac').value = datosPacienteCompleto.nacimiento || datosPacienteCompleto.nac || datosPacienteCompleto.fechaNacimiento || '';
                 document.getElementById('val-edad').value = datosPacienteCompleto.edad || '';
                 document.getElementById('val-diag').value = datosPacienteCompleto.diagnostico || datosPacienteCompleto.diag || '';
             });
 
+            // Cargar historial de informes previos para el selector
             db.ref('historial_informes/' + nombre).once('value', snap => {
                 historialesPacienteCache = {};
                 const selectCopiar = document.getElementById('select-copiar-previo');
                 selectCopiar.innerHTML = '<option value="">Selecciona un informe previo para autocompletar...</option>';
-                snap.forEach(child => {
-                    const inf = child.val();
-                    const key = child.key;
-                    historialesPacienteCache[key] = inf;
-                    const opt = document.createElement('option');
-                    opt.value = key;
-                    opt.textContent = `[${inf.area}] - ${inf.tipo} (${new Date(inf.fecha).toLocaleDateString()})`;
-                    selectCopiar.appendChild(opt);
-                });
+                
+                if (snap.exists()) {
+                    snap.forEach(child => {
+                        const inf = child.val();
+                        const key = child.key;
+                        historialesPacienteCache[key] = inf;
+                        const opt = document.createElement('option');
+                        opt.value = key;
+                        opt.textContent = `[${inf.area || 'General'}] - ${inf.tipo || 'Informe'} (${new Date(inf.fecha).toLocaleDateString()})`;
+                        selectCopiar.appendChild(opt);
+                    });
+                } else {
+                    selectCopiar.innerHTML = '<option value="">(No hay informes previos registrados)</option>';
+                }
             });
 
             cargarInformeArea();
@@ -285,7 +308,7 @@
                 contenedor.innerHTML = `
                     <div style="margin-top:15px;"><label><b>INTRODUCCIÓN / DESCRIPCIÓN DEL TRIMESTRE:</b></label><textarea id="f-intro" placeholder="Durante este segundo trimestre..."></textarea></div>
                     <div style="margin-top:15px;">
-                        <label><b>ESTADO DE LA RÚBRICA (Selecciona valores rápidos o personaliza):</b></label>
+                        <label><b>ESTADO DE LA RÚBRICA:</b></label>
                         <table class="rubrica" id="tabla-rubrica-inputs">
                             <tr><th>Ítem de Evaluación</th><th>Estado (L / LCA / EVL)</th></tr>
                             <tr><td>Control postural (Musculatura extensora/abdominal/sedestación)</td><td><input type="text" id="r1" value="LCA" style="padding:4px;"></td></tr>
@@ -523,6 +546,7 @@
 
                 db.ref('historial_informes/' + nombre).push(dataRegistro);
                 db.ref('informes_por_area/' + nombre + '/' + area + '/' + document.getElementById('tipo-informe').value).set(dataRegistro);
+                alert("¡PDF generado y guardado en el historial con éxito!");
             }).catch(err => {
                 if (document.body.contains(elementoTemporal)) document.body.removeChild(elementoTemporal);
                 alert("Error al exportar PDF: " + err.message);
@@ -533,9 +557,8 @@
             const nombre = document.getElementById('paciente-select').value;
             const area = document.getElementById('area-rep').value;
             const tipo = document.getElementById('tipo-informe').value;
-            if (!nombre) return;
+            if (!nombre) return alert("Selecciona un paciente antes de guardar.");
             
-            // Recolectar dinámicamente los campos actuales
             let datosInputs = {};
             document.querySelectorAll('#campos-dinamicos-modelo input, #campos-dinamicos-modelo textarea').forEach(el => {
                 if (el.id) datosInputs[el.id] = el.value;
