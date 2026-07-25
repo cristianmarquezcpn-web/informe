@@ -543,38 +543,32 @@ async function exportarPDF() {
     const edad = document.getElementById('val-edad').value || 'S/D';
     const diagnostico = document.getElementById('val-diag').value || 'S/D';
     
-    // Recuperamos los gráficos institucionales y la firma del navegador
     const logoGuardado = localStorage.getItem('logo_institucional_esencial') || '';
     const pieGuardado = localStorage.getItem('pie_institucional_esencial') || '';
-    const firmaGuardada = localStorage.getItem('firma_sello_profesional');
 
     const elementoTemporal = document.createElement('div');
     elementoTemporal.id = 'print-section';
     elementoTemporal.style.fontFamily = "'Times New Roman', Times, serif"; 
     elementoTemporal.style.fontSize = "14px";
-    elementoTemporal.style.padding = "10mm 15mm";
+    elementoTemporal.style.padding = "10px 20px";
     elementoTemporal.style.backgroundColor = "#ffffff";
     elementoTemporal.style.boxSizing = "border-box";
+    elementoTemporal.style.width = "100%";
     
     elementoTemporal.innerHTML = `
-        <!-- ENCABEZADO INSTITUCIONAL A ANCHO COMPLETO (SIN LÍNEA EXTRA) -->
-        <header style="position: fixed; top: 0; left: 0; width: 100%; background-color: #ffffff; z-index: 1000; padding: 10px 15mm; box-sizing: border-box;">
-            <div style="width: 100%;">
-                ${logoGuardado ? `<img src="${logoGuardado}" style="width: 100%; max-height: 70px; object-fit: contain; display: block;" />` : `
-                    <h1 style="color: #1a2a6c; margin: 0; font-size: 38px; font-weight: bold; font-family: 'Georgia', serif;">Esencial</h1>
-                `}
-            </div>
-        </header>
+        <!-- ENCABEZADO A ANCHO TOTAL REAL -->
+        <div style="width: 100%; margin-bottom: 20px; text-align: left;">
+            ${logoGuardado ? `<img src="${logoGuardado}" style="width: 100%; height: auto; max-height: 90px; object-fit: contain; display: block;" />` : `
+                <h1 style="color: #1a2a6c; margin: 0; font-size: 38px; font-weight: bold; font-family: 'Georgia', serif;">Esencial</h1>
+            `}
+        </div>
 
-        <!-- ESPACIADOR INVISIBLE PARA QUE EL TEXTO NO QUEDE TAPADO POR EL HEADER FIJO -->
-        <div style="height: 80px;"></div>
-
-        <div style="text-align: center; font-weight: bold; margin-bottom: 25px; font-size: 15px;">
+        <div style="text-align: center; font-weight: bold; margin-bottom: 20px; font-size: 15px;">
             <div style="text-decoration: underline;">${textoTypeVal}</div>
             <div style="margin-top: 5px;">${anioActual}</div>
         </div>
 
-        <ul style="list-style-type: disc; margin-bottom: 35px; padding-left: 40px; line-height: 2.0;">
+        <ul style="list-style-type: disc; margin-bottom: 25px; padding-left: 40px; line-height: 1.8;">
             <li><strong>ÁREA:</strong> <span style="text-transform: uppercase;">${area}</span></li>
             <li><strong>APELLIDO Y NOMBRE DEL BENEFICIARIO:</strong> <span style="text-transform: uppercase;">${nombre}</span></li>
             <li><strong>FECHA DE NACIMIENTO:</strong> ${fechaNac}</li>
@@ -584,44 +578,21 @@ async function exportarPDF() {
             <li><strong>PROFESIONAL / RESPONSABLE:</strong> <span style="text-transform: uppercase;">${profesional}</span></li>
         </ul>
 
-        <!-- CUERPO DEL INFORME -->
-        <div class="contenido-quill" style="line-height: 1.6; padding-left: 10px; padding-right: 10px; margin-bottom: 40px;">
+        <!-- CUERPO DEL INFORME (INCLUYE LOS SELLOS QUE HAYAS INSERTADO DENTRO DE QUILL) -->
+        <div class="contenido-quill" style="line-height: 1.6; margin-bottom: 30px;">
             ${quillEditor.root.innerHTML} 
         </div>
 
-        <!-- ESPACIO DE FIRMA Y SELLO -->
-        <div style="margin-top: 40px; display: flex; justify-content: flex-end; page-break-inside: avoid;">
-            <div style="text-align: center; width: 250px;">
-                <div style="height: 70px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px;">
-                    <div id="espacio-firma-render"></div>
-                </div>
-                <div style="border-top: 1px solid #000000; padding-top: 5px; font-size: 12px; font-weight: bold; text-transform: uppercase;">
-                    ${profesional}
-                </div>
-                <div style="font-size: 11px; color: #555;">Firma y Sello Profesional</div>
-            </div>
-        </div>
-
-        <!-- PIE DE PÁGINA INSTITUCIONAL FIJO A ANCHO COMPLETO -->
-        <footer style="position: fixed; bottom: 0; left: 0; width: 100%; background-color: #ffffff; z-index: 1000; text-align: center; padding: 10px 15mm; box-sizing: border-box;">
-            ${pieGuardado ? `<img src="${pieGuardado}" style="width: 100%; max-height: 65px; object-fit: contain; display: block;" />` : `
+        <!-- PIE DE PÁGINA A ANCHO TOTAL REAL -->
+        <div style="width: 100%; margin-top: 40px; text-align: center; page-break-inside: avoid;">
+            ${pieGuardado ? `<img src="${pieGuardado}" style="width: 100%; height: auto; max-height: 80px; object-fit: contain; display: block;" />` : `
                 <div style="font-family: Arial, sans-serif; font-size: 10px; color: #1a2a6c;">
                     <div>www.esencialsalud.com.ar | 4323086 / 4210238</div>
                     <div>25 de mayo 30 (E) Ciudad de San Juan</div>
                 </div>
             `}
-        </footer>
+        </div>
     `;
-
-    // Inyectamos la firma o sello guardado exactamente en el espacio correcto
-    if (firmaGuardada) {
-        const contenedorFirma = elementoTemporal.querySelector('#espacio-firma-render');
-        if (contenedorFirma) {
-            contenedorFirma.innerHTML = `
-                <img src="${firmaGuardada}" style="max-height: 65px; max-width: 200px; object-fit: contain;" />
-            `;
-        }
-    }
 
     document.body.appendChild(elementoTemporal);
 
@@ -721,8 +692,6 @@ function actualizarSelectSellos() {
         select.appendChild(option);
     });
 }
-
-// Función para insertar el sello elegido exactamente donde está el cursor en Quill
 function insertarSelloSeleccionadoEnQuill() {
     const select = document.getElementById('select-sello-activo');
     const indexSeleccionado = select.value;
@@ -736,17 +705,18 @@ function insertarSelloSeleccionadoEnQuill() {
     
     if (!selloElegido) return alert("No se encontró el sello seleccionado.");
     
-    // Obtenemos la posición del cursor en Quill
+    // Obtenemos la posición actual del cursor
     const range = quillEditor.getSelection();
-    let index = range ? range.index : quillEditor.getLength();
     
-    // Insertamos la imagen del sello con un tamaño controlado (ej: 160px de ancho)
+    // Si el usuario no hizo clic dentro del editor, lo ponemos al final del texto en lugar de arriba (0)
+    let index = (range && range.index !== null) ? range.index : quillEditor.getLength();
+    
+    // Insertamos la imagen del sello
     quillEditor.clipboard.dangerouslyPasteHTML(index, `<p><img src="${selloElegido.imagen}" style="max-width: 160px; height: auto;"/></p>`);
     
-    // Movemos el cursor después de la imagen
+    // Movemos el cursor después de la inserción
     quillEditor.setSelection(index + 1);
 }
-
 // Ejecutamos esta función al cargar la página para que el menú aparezca lleno con los sellos guardados
 document.addEventListener('DOMContentLoaded', () => {
     actualizarSelectSellos();
