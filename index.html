@@ -550,42 +550,45 @@ async function exportarPDF() {
     elementoTemporal.id = 'print-section';
     elementoTemporal.style.fontFamily = "'Times New Roman', Times, serif"; 
     elementoTemporal.style.fontSize = "14px";
-    elementoTemporal.style.padding = "10px 20px";
+    elementoTemporal.style.padding = "0"; // Quitamos padding general para que el header toque los bordes si es necesario
     elementoTemporal.style.backgroundColor = "#ffffff";
     elementoTemporal.style.boxSizing = "border-box";
     elementoTemporal.style.width = "100%";
     
     elementoTemporal.innerHTML = `
-        <!-- ENCABEZADO A ANCHO TOTAL REAL -->
-        <div style="width: 100%; margin-bottom: 20px; text-align: left;">
-            ${logoGuardado ? `<img src="${logoGuardado}" style="width: 100%; height: auto; max-height: 90px; object-fit: contain; display: block;" />` : `
+        <!-- ENCABEZADO: FORZADO A OCUPAR TODO EL ANCHO Y EXPANDIR LA IMAGEN -->
+        <div style="width: 100%; margin-bottom: 25px; text-align: center; background-color: #ffffff;">
+            ${logoGuardado ? `<img src="${logoGuardado}" style="width: 100%; max-height: 110px; object-fit: fill; display: block;" />` : `
                 <h1 style="color: #1a2a6c; margin: 0; font-size: 38px; font-weight: bold; font-family: 'Georgia', serif;">Esencial</h1>
             `}
         </div>
 
-        <div style="text-align: center; font-weight: bold; margin-bottom: 20px; font-size: 15px;">
-            <div style="text-decoration: underline;">${textoTypeVal}</div>
-            <div style="margin-top: 5px;">${anioActual}</div>
+        <!-- CONTENEDOR CON PADDING PARA EL TEXTO DEL INFORME -->
+        <div style="padding: 0 20px;">
+            <div style="text-align: center; font-weight: bold; margin-bottom: 25px; font-size: 15px;">
+                <div style="text-decoration: underline;">${textoTypeVal}</div>
+                <div style="margin-top: 5px;">${anioActual}</div>
+            </div>
+
+            <ul style="list-style-type: disc; margin-bottom: 30px; padding-left: 40px; line-height: 1.8;">
+                <li><strong>ÁREA:</strong> <span style="text-transform: uppercase;">${area}</span></li>
+                <li><strong>APELLIDO Y NOMBRE DEL BENEFICIARIO:</strong> <span style="text-transform: uppercase;">${nombre}</span></li>
+                <li><strong>FECHA DE NACIMIENTO:</strong> ${fechaNac}</li>
+                <li><strong>EDAD:</strong> ${edad}</li>
+                <li><strong>DIAGNÓSTICO (SEGÚN CUD):</strong> ${diagnostico}</li>
+                <li><strong>FECHA DE INFORME:</strong> ${fechaHoy}</li>
+                <li><strong>PROFESIONAL / RESPONSABLE:</strong> <span style="text-transform: uppercase;">${profesional}</span></li>
+            </ul>
+
+            <!-- CUERPO DEL INFORME (INCLUYE SELLOS INSERTADOS) -->
+            <div class="contenido-quill" style="line-height: 1.6; margin-bottom: 40px;">
+                ${quillEditor.root.innerHTML} 
+            </div>
         </div>
 
-        <ul style="list-style-type: disc; margin-bottom: 25px; padding-left: 40px; line-height: 1.8;">
-            <li><strong>ÁREA:</strong> <span style="text-transform: uppercase;">${area}</span></li>
-            <li><strong>APELLIDO Y NOMBRE DEL BENEFICIARIO:</strong> <span style="text-transform: uppercase;">${nombre}</span></li>
-            <li><strong>FECHA DE NACIMIENTO:</strong> ${fechaNac}</li>
-            <li><strong>EDAD:</strong> ${edad}</li>
-            <li><strong>DIAGNÓSTICO (SEGÚN CUD):</strong> ${diagnostico}</li>
-            <li><strong>FECHA DE INFORME:</strong> ${fechaHoy}</li>
-            <li><strong>PROFESIONAL / RESPONSABLE:</strong> <span style="text-transform: uppercase;">${profesional}</span></li>
-        </ul>
-
-        <!-- CUERPO DEL INFORME (INCLUYE LOS SELLOS QUE HAYAS INSERTADO DENTRO DE QUILL) -->
-        <div class="contenido-quill" style="line-height: 1.6; margin-bottom: 30px;">
-            ${quillEditor.root.innerHTML} 
-        </div>
-
-        <!-- PIE DE PÁGINA A ANCHO TOTAL REAL -->
+        <!-- PIE DE PÁGINA: FORZADO A OCUPAR TODO EL ANCHO -->
         <div style="width: 100%; margin-top: 40px; text-align: center; page-break-inside: avoid;">
-            ${pieGuardado ? `<img src="${pieGuardado}" style="width: 100%; height: auto; max-height: 80px; object-fit: contain; display: block;" />` : `
+            ${pieGuardado ? `<img src="${pieGuardado}" style="width: 100%; max-height: 100px; object-fit: fill; display: block;" />` : `
                 <div style="font-family: Arial, sans-serif; font-size: 10px; color: #1a2a6c;">
                     <div>www.esencialsalud.com.ar | 4323086 / 4210238</div>
                     <div>25 de mayo 30 (E) Ciudad de San Juan</div>
