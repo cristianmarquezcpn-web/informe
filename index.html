@@ -37,6 +37,27 @@
         table.rubrica { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 15px; }
         table.rubrica th, table.rubrica td { border: 1px solid #cbd5e1; padding: 8px; text-align: left; font-size: 13px; }
         table.rubrica th { background: #f1f5f9; }
+        @media print {
+    /* Ocultamos toda la interfaz de la web por defecto */
+    body * {
+        visibility: hidden;
+    }
+    
+    /* Hacemos visible únicamente nuestro elemento temporal de impresión */
+    #print-section, #print-section * {
+        visibility: visible;
+    }
+    
+    /* Ubicamos el informe limpiamente arriba a la izquierda en la hoja */
+    #print-section {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 15mm;
+    }
+}
     </style>
 </head>
 <body>
@@ -458,91 +479,93 @@
             btn.textContent = '🤖 CORREGIR Y PASAR AL EDITOR';
         }
 async function exportarPDF() {
-const nombre = document.getElementById('paciente-select').value;
-if (!nombre) return alert("Selecciona un paciente.");
-const area = document.getElementById('area-rep').value || '_________________';
-const profesional = document.getElementById('profesional-rep').value || '_________________';
-const tipoInforme = document.getElementById('tipo-informe');
-const textoTypeVal = tipoInforme.options[tipoInforme.selectedIndex].text.toUpperCase();
-const anioActual = new Date().getFullYear();
-const fechaHoy = document.getElementById('val-fechainf').value || new Date().toLocaleDateString('es-AR');
-const fechaNac = document.getElementById('val-nac').value || 'S/D';
-const edad = document.getElementById('val-edad').value || 'S/D';
-const diagnostico = document.getElementById('val-diag').value || 'S/D';
-const elementoTemporal = document.createElement('div');
-elementoTemporal.style.fontFamily = "'Times New Roman', Times, serif";
-elementoTemporal.style.fontSize = "14px";
-elementoTemporal.style.padding = "40px";
-elementoTemporal.style.position = "fixed";
-elementoTemporal.style.left = "0";
-elementoTemporal.style.top = "0";
-elementoTemporal.style.width = "210mm";
-elementoTemporal.style.backgroundColor = "#ffffff";
-elementoTemporal.style.boxSizing = "border-box";
-elementoTemporal.style.zIndex = "-9999";
-elementoTemporal.style.opacity = "0";
-elementoTemporal.style.pointerEvents = "none";
-elementoTemporal.innerHTML = `
-<div style="display: flex; align-items: flex-end; margin-bottom: 30px;">
-<h1 style="color: #1a2a6c; margin: 0; font-size: 42px; font-weight: bold; line-height: 0.8; font-family: 'Georgia', serif;">Esencial</h1>
-<div style="flex-grow: 1; height: 3px; background-color: #1a2a6c; margin-left: 15px; margin-bottom: 6px;"></div>
-</div>
-<div style="text-align: center; font-weight: bold; margin-bottom: 25px; font-size: 15px;">
-<div style="text-decoration: underline;">${textoTypeVal}</div>
-<div style="margin-top: 5px;">${anioActual}</div>
-</div>
-<ul style="list-style-type: disc; margin-bottom: 35px; padding-left: 40px; line-height: 2.0;">
-<li><strong>ÁREA:</strong> <span style="text-transform: uppercase;">${area}</span></li>
-<li><strong>APELLIDO Y NOMBRE DEL BENEFICIARIO:</strong> <span style="text-transform: uppercase;">${nombre}</span></li>
-<li><strong>FECHA DE NACIMIENTO:</strong> ${fechaNac}</li>
-<li><strong>EDAD:</strong> ${edad}</li>
-<li><strong>DIAGNÓSTICO (SEGÚN CUD):</strong> ${diagnostico}</li>
-<li><strong>FECHA DE INFORME:</strong> ${fechaHoy}</li>
-<li><strong>PROFESIONAL / RESPONSABLE:</strong> <span style="text-transform: uppercase;">${profesional}</span></li>
-</ul>
-<div class="contenido-quill" style="line-height: 1.6; padding-left: 10px; padding-right: 10px; margin-bottom: 60px;">
-${quillEditor.root.innerHTML}
-</div>
-<div style="margin-top: 40px; font-family: Arial, sans-serif;">
-<div style="display:flex; justify-content:center; gap: 40px; font-size: 11px; color: #1a2a6c; margin-bottom: 8px;">
-<div>🌐 www.esencialsalud.com.ar</div>
-<div>📞 4323086 / 4210238</div>
-</div>
-<div style="display:flex; justify-content:center; gap: 40px; font-size: 11px; color: #1a2a6c; margin-bottom: 15px;">
-<div>✉️ contacto@esencialsalud.com.ar</div>
-<div>📍 25 de mayo 30 (E) Ciudad de San Juan / Av. Córdoba 585 (O)</div>
-</div>
-<div style="background-color: #1a2a6c; height: 35px; border-top-left-radius: 40px; margin-left: 200px;"></div>
-</div>
-`;
-document.body.appendChild(elementoTemporal);
-// Damos un pequeño respiro para que el DOM renderice los elementos antes de capturarlos
-setTimeout(() => {
-const opciones = {
-margin: [10, 10, 10, 10],
-filename: `Informe_${area}_${textoTypeVal.replace(/\s+/g, '_')}_${nombre.replace(/\s+/g, '_')}.pdf`,
-image: { type: 'jpeg', quality: 0.98 },
-html2canvas: { scale: 2, useCORS: true, logging: true },
-jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-};
-html2pdf().set(opciones).from(elementoTemporal).save().then(() => {
-document.body.removeChild(elementoTemporal);
-const dataRegistro = {
-fecha: Date.now(),
-tipo: textoTypeVal,
-area: area,
-profesional: profesional,
-contenidoHTML: quillEditor.root.innerHTML,
-modulo: document.getElementById('mod').value
-};
-db.ref('historial_informes/' + nombre).push(dataRegistro);
-db.ref('informes_por_area/' + nombre + '/' + area + '/' + document.getElementById('tipo-informe').value).set(dataRegistro);
-alert("¡PDF generado y guardado en el historial con éxito!");
-}).catch(err => {
-if (document.body.contains(elementoTemporal)) document.body.removeChild(elementoTemporal);
-alert("Error al exportar PDF: " + err.message);
-});
-}, 300);
+    const nombre = document.getElementById('paciente-select').value;
+    if (!nombre) return alert("Selecciona un paciente.");
+    
+    const area = document.getElementById('area-rep').value || '_________________';
+    const profesional = document.getElementById('profesional-rep').value || '_________________';
+    const tipoInforme = document.getElementById('tipo-informe');
+    const textoTypeVal = tipoInforme.options[tipoInforme.selectedIndex].text.toUpperCase();
+    
+    const anioActual = new Date().getFullYear();
+    const fechaHoy = document.getElementById('val-fechainf').value || new Date().toLocaleDateString('es-AR');
+    const fechaNac = document.getElementById('val-nac').value || 'S/D';
+    const edad = document.getElementById('val-edad').value || 'S/D';
+    const diagnostico = document.getElementById('val-diag').value || 'S/D';
+    
+    // Creamos un contenedor exclusivo para la impresión nativa
+    const elementoTemporal = document.createElement('div');
+    elementoTemporal.id = 'print-section'; // Asignamos ID para controlarlo por CSS
+    elementoTemporal.style.fontFamily = "'Times New Roman', Times, serif"; 
+    elementoTemporal.style.fontSize = "14px";
+    elementoTemporal.style.padding = "20px";
+    elementoTemporal.style.backgroundColor = "#ffffff";
+    elementoTemporal.style.boxSizing = "border-box";
+    
+    elementoTemporal.innerHTML = `
+        <div style="display: flex; align-items: flex-end; margin-bottom: 30px;">
+            <h1 style="color: #1a2a6c; margin: 0; font-size: 42px; font-weight: bold; line-height: 0.8; font-family: 'Georgia', serif;">Esencial</h1>
+            <div style="flex-grow: 1; height: 3px; background-color: #1a2a6c; margin-left: 15px; margin-bottom: 6px;"></div>
+        </div>
+
+        <div style="text-align: center; font-weight: bold; margin-bottom: 25px; font-size: 15px;">
+            <div style="text-decoration: underline;">${textoTypeVal}</div>
+            <div style="margin-top: 5px;">${anioActual}</div>
+        </div>
+
+        <ul style="list-style-type: disc; margin-bottom: 35px; padding-left: 40px; line-height: 2.0;">
+            <li><strong>ÁREA:</strong> <span style="text-transform: uppercase;">${area}</span></li>
+            <li><strong>APELLIDO Y NOMBRE DEL BENEFICIARIO:</strong> <span style="text-transform: uppercase;">${nombre}</span></li>
+            <li><strong>FECHA DE NACIMIENTO:</strong> ${fechaNac}</li>
+            <li><strong>EDAD:</strong> ${edad}</li>
+            <li><strong>DIAGNÓSTICO (SEGÚN CUD):</strong> ${diagnostico}</li>
+            <li><strong>FECHA DE INFORME:</strong> ${fechaHoy}</li>
+            <li><strong>PROFESIONAL / RESPONSABLE:</strong> <span style="text-transform: uppercase;">${profesional}</span></li>
+        </ul>
+
+        <div class="contenido-quill" style="line-height: 1.6; padding-left: 10px; padding-right: 10px; margin-bottom: 60px;">
+            ${quillEditor.root.innerHTML} 
+        </div>
+
+        <div style="margin-top: 40px; font-family: Arial, sans-serif;">
+            <div style="display:flex; justify-content:center; gap: 40px; font-size: 11px; color: #1a2a6c; margin-bottom: 8px;">
+                <div>🌐 www.esencialsalud.com.ar</div>
+                <div>📞 4323086 / 4210238</div>
+            </div>
+            <div style="display:flex; justify-content:center; gap: 40px; font-size: 11px; color: #1a2a6c; margin-bottom: 15px;">
+                <div>✉️ contacto@esencialsalud.com.ar</div>
+                <div>📍 25 de mayo 30 (E) Ciudad de San Juan / Av. Córdoba 585 (O)</div>
+            </div>
+            <div style="background-color: #1a2a6c; height: 35px; border-top-left-radius: 40px; margin-left: 200px;"></div>
+        </div>
+    `;
+
+    document.body.appendChild(elementoTemporal);
+
+    try {
+        // Disparamos la impresión del navegador (el usuario podrá elegir "Guardar como PDF")
+        window.print();
+
+        // Una vez que se cierra o ejecuta la impresión, guardamos en Firebase y limpiamos
+        document.body.removeChild(elementoTemporal);
+
+        const dataRegistro = {
+            fecha: Date.now(),
+            tipo: textoTypeVal,
+            area: area,
+            profesional: profesional,
+            contenidoHTML: quillEditor.root.innerHTML,
+            modulo: document.getElementById('mod').value
+        };
+
+        db.ref('historial_informes/' + nombre).push(dataRegistro);
+        db.ref('informes_por_area/' + nombre + '/' + area + '/' + document.getElementById('tipo-informe').value).set(dataRegistro);
+        
+        alert("¡Informe procesado y guardado en el historial con éxito!");
+    } catch (err) {
+        if (document.body.contains(elementoTemporal)) document.body.removeChild(elementoTemporal);
+        alert("Error al procesar el informe: " + err.message);
+    }
 }
 
         function guardarBorrador() {
