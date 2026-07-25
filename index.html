@@ -71,10 +71,28 @@
         </button>
     </div>
 </div>
+<div style="background: #f4f6f9; padding: 15px; border-radius: 8px; margin-bottom: 15px; font-family: Arial, sans-serif;">
+    <h4 style="margin-top: 0; color: #1a2a6c;">Gestión de Sellos y Firmas</h4>
+    
+    <!-- Subir nuevo sello -->
+    <div style="margin-bottom: 10px;">
+        <label style="font-size: 12px; font-weight: bold;">Nombre del Sello o Profesional:</label><br>
+        <input type="text" id="nombre-sello-input" placeholder="Ej: Lic. Cristian - Psicología" style="width: 100%; padding: 6px; box-sizing: border-box; margin-top: 4px;">
+    </div>
+    <div style="margin-bottom: 10px;">
+        <label style="font-size: 12px; font-weight: bold;">Imagen de la Firma/Sello:</label><br>
+        <input type="file" id="archivo-sello-input" accept="image/*">
+    </div>
+    <button type="button" onclick="guardarNuevoSello()" style="background: #1a2a6c; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">Guardar Sello</button>
+</div>
 
-<div style="margin: 10px 0;">
-    <label style="font-size: 13px; font-weight: bold;">Subir mi Firma y Sello:</label>
-    <input type="file" id="subir-firma" accept="image/*" onchange="cargarFirma(event)">
+<!-- Selector para elegir cuál insertar -->
+<div style="margin-top: 15px;">
+    <label style="font-size: 12px; font-weight: bold;">Seleccionar Sello a Insertar:</label><br>
+    <select id="select-sello-activo" style="width: 100%; padding: 8px; margin-top: 4px; border-radius: 4px; border: 1px solid #ccc;">
+        <option value="">-- Seleccione un sello --</option>
+    </select>
+    <button type="button" onclick="insertarSelloSeleccionadoEnQuill()" style="margin-top: 8px; background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">🖋️ Insertar Sello Seleccionado en el Texto</button>
 </div>
     <div id="app-content" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -625,17 +643,87 @@ async function exportarPDF() {
               .then(() => alert("Borrador guardado correctamente."));
         }
         
-function cargarFirma(event) {
-    const archivo = event.target.files[0];
-    if (archivo) {
-        const lector = new FileReader();
-        lector.onload = function(e) {
-            localStorage.setItem('firma_sello_profesional', e.target.result);
-            alert("¡Firma y sello guardados correctamente para los próximos informes!");
-        };
-        lector.readAsDataURL(archivo);
-    }
+
+// Función para guardar un nuevo sello en la lista del navegador
+function guardarNuevoSello() {
+    const nombreSello = document.getElementById('nombre-sello-input').value.trim();
+    const inputArchivo = document.getElementById('archivo-sello-input');
+    
+    if (!nombreSello) return alert("Por favor, ingresa un nombre para identificar el sello.");
+    if (inputArchivo.files.length === 0) return alert("Por favor, selecciona una imagen.");
+
+    const archivo = inputArchivo.files[0];
+    const lector = new FileReader();
+
+    lector.onload = function(e) {
+        const base64Imagen = e.target.result;
+        
+        // Recuperamos la lista actual de sellos o creamos una vacía
+        let listaSellos = JSON.parse(localStorage.getItem('lista_sellos_profesionales')) || [];
+        
+        // Añadimos el nuevo sello
+        listaSellos.push({ nombre: nombreSello, imagen: base64Imagen });
+        
+        // Guardamos de nuevo en el localStorage
+        localStorage.setItem('lista_sellos_profesionales', JSON.stringify(listaSellos));
+        
+        alert(`¡Sello "${nombreSello}" guardado con éxito!`);
+        
+        // Limpiamos campos y actualizamos el selector
+        document.getElementById('nombre-sello-input').value = '';
+        inputArchivo.value = '';
+        actualizarSelectSellos();
+    };
+
+    lector.readAsDataURL(archivo);
 }
+
+// Función para actualizar las opciones del menú desplegable automáticamente
+function actualizarSelectSellos() {
+    const select = document.getElementById('select-sello-activo');
+    if (!select) return;
+    
+    select.innerHTML = '<option value="">-- Seleccione un sello --</option>';
+    
+    let listaSellos = JSON.parse(localStorage.getItem('lista_sellos_profesionales')) || [];
+    
+    listaSellos.forEach((sello, index) => {
+        const option = document.createElement('option');
+        option.value = index; // Guardamos el índice del array
+        option.textContent = sello.nombre;
+        select.appendChild(option);
+    });
+}
+
+// Función para insertar el sello elegido exactamente donde está el cursor en Quill
+function insertarSelloSeleccionadoEnQuill() {
+    const select = document.getElementById('select-sello-activo');
+    const indexSeleccionado = select.value;
+    
+    if (indexSeleccionado === "") {
+        return alert("Por favor, selecciona un sello del menú desplegable.");
+    }
+    
+    let listaSellos = JSON.parse(localStorage.getItem('lista_sellos_profesionales')) || [];
+    const selloElegido = listaSellos[indexSeleccionado];
+    
+    if (!selloElegido) return alert("No se encontró el sello seleccionado.");
+    
+    // Obtenemos la posición del cursor en Quill
+    const range = quillEditor.getSelection();
+    let index = range ? range.index : quillEditor.getLength();
+    
+    // Insertamos la imagen del sello con un tamaño controlado (ej: 160px de ancho)
+    quillEditor.clipboard.dangerouslyPasteHTML(index, `<p><img src="${selloElegido.imagen}" style="max-width: 160px; height: auto;"/></p>`);
+    
+    // Movemos el cursor después de la imagen
+    quillEditor.setSelection(index + 1);
+}
+
+// Ejecutamos esta función al cargar la página para que el menú aparezca lleno con los sellos guardados
+document.addEventListener('DOMContentLoaded', () => {
+    actualizarSelectSellos();
+});        
     </script>
 </body>
 </html>
