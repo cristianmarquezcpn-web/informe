@@ -630,22 +630,19 @@ async function generarBorradorIA() {
 
             const tablaInputs = document.querySelectorAll('#tabla-rubrica-inputs input');
             
-            // Creamos la tabla de forma segura con DOM en lugar de texto plano
+            // Creamos la tabla con anchos fijos absolutos para evitar que colapse
             const tabla = document.createElement('table');
-            tabla.style.width = '100%';
-            tabla.style.borderCollapse = 'collapse';
-            tabla.style.fontSize = '13px';
-            tabla.style.marginBottom = '15px';
-            tabla.style.border = '1px solid #000';
+            tabla.setAttribute('border', '1');
+            tabla.style.cssText = 'width: 100%; border-collapse: collapse; font-family: "Times New Roman", Times, serif; font-size: 13px; margin-top: 10px; margin-bottom: 15px; background-color: #ffffff;';
 
-            // Encabezado
+            // Encabezado con anchos estrictos
             const thead = document.createElement('thead');
             thead.innerHTML = `
                 <tr style="background-color: #f2f2f2;">
-                    <th style="text-align: left; padding: 6px; border: 1px solid #000;">Ítem de Evaluación</th>
-                    <th style="width: 50px; text-align: center; padding: 6px; border: 1px solid #000;">L</th>
-                    <th style="width: 50px; text-align: center; padding: 6px; border: 1px solid #000;">LCA</th>
-                    <th style="width: 50px; text-align: center; padding: 6px; border: 1px solid #000;">EVL</th>
+                    <th style="text-align: left; padding: 8px; border: 1px solid #000; width: 70%;">Ítem de Evaluación</th>
+                    <th style="width: 10%; text-align: center; padding: 8px; border: 1px solid #000;">L</th>
+                    <th style="width: 10%; text-align: center; padding: 8px; border: 1px solid #000;">LCA</th>
+                    <th style="width: 10%; text-align: center; padding: 8px; border: 1px solid #000;">EVL</th>
                 </tr>
             `;
             tabla.appendChild(thead);
@@ -658,16 +655,16 @@ async function generarBorradorIA() {
                     const textoItem = filaInput ? filaInput.cells[0].innerText : 'Ítem';
                     const val = input.value.toUpperCase();
                     
-                    let l = val === 'L' ? 'X' : '';
-                    let lca = val === 'LCA' ? 'X' : '';
-                    let evl = val === 'EVL' ? 'X' : '';
+                    let l = val === 'L' ? 'X' : '&nbsp;';
+                    let lca = val === 'LCA' ? 'X' : '&nbsp;';
+                    let evl = val === 'EVL' ? 'X' : '&nbsp;';
 
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td style="padding: 6px; border: 1px solid #000;">${textoItem}</td>
-                        <td style="text-align: center; padding: 6px; border: 1px solid #000;"><b>${l}</b></td>
-                        <td style="text-align: center; padding: 6px; border: 1px solid #000;"><b>${lca}</b></td>
-                        <td style="text-align: center; padding: 6px; border: 1px solid #000;"><b>${evl}</b></td>
+                        <td style="padding: 8px; border: 1px solid #000; vertical-align: middle;">${textoItem}</td>
+                        <td style="text-align: center; padding: 8px; border: 1px solid #000; vertical-align: middle;"><b>${l}</b></td>
+                        <td style="text-align: center; padding: 8px; border: 1px solid #000; vertical-align: middle;"><b>${lca}</b></td>
+                        <td style="text-align: center; padding: 8px; border: 1px solid #000; vertical-align: middle;"><b>${evl}</b></td>
                     `;
                     tbody.appendChild(tr);
                 }
@@ -675,8 +672,8 @@ async function generarBorradorIA() {
             tabla.appendChild(tbody);
 
             camposHtml = `<p>${inputsRecopilados.f_intro}</p><br>
-                          <p><strong>RÚBRICA DE OBJETIVOS TERAPÉUTICOS:</strong> (L: Logrado | LCA: Logrado con Autonomía | EVL: En Vías de Logro)</p>
-                          ${tabla.outerHTML}<br>
+                          <p><strong>RÚBRICA DE OBJETIVOS TERAPÉUTICOS:</strong> (L: Logrado | LCA: Logrado con Autonomía | EVL: En Vías de Logro)</p><br>
+                          ${tabla.outerHTML}<br><br>
                           <p><strong>OBSERVACIONES ADICIONALES DE RÚBRICA:</strong><br>${inputsRecopilados.f_obs}</p>`;
         } else if (tipo === 'trimestral3') {
             inputsRecopilados.f_resumen = document.getElementById('f-resumen').value;
