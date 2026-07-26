@@ -628,20 +628,48 @@ async function generarBorradorIA() {
             inputsRecopilados.f_intro = document.getElementById('f-intro').value;
             inputsRecopilados.f_obs = document.getElementById('f-obs').value;
 
+            // Recopilamos los inputs armando directamente una TABLA HTML con bordes
             const tablaInputs = document.querySelectorAll('#tabla-rubrica-inputs input');
-            let rubricaResumenHtml = "<ul>";
+            let rubricaTablaHtml = `
+                <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 15px;" border="1">
+                    <thead>
+                        <tr style="background-color: #f2f2f2;">
+                            <th style="text-align: left; padding: 6px; border: 1px solid #000;">Ítem de Evaluación</th>
+                            <th style="width: 50px; text-align: center; padding: 6px; border: 1px solid #000;">L</th>
+                            <th style="width: 50px; text-align: center; padding: 6px; border: 1px solid #000;">LCA</th>
+                            <th style="width: 50px; text-align: center; padding: 6px; border: 1px solid #000;">EVL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
             tablaInputs.forEach(input => {
                 if (input.value.trim() !== "") {
                     const fila = input.closest('tr');
                     const textoItem = fila ? fila.cells[0].innerText : 'Ítem';
-                    rubricaResumenHtml += `<li>${textoItem}: <b>[${input.value}]</b></li>`;
+                    const val = input.value.toUpperCase();
+                    
+                    // Asignamos una X o el valor donde corresponda según lo que seleccionó el usuario
+                    let l = val === 'L' ? 'X' : '';
+                    let lca = val === 'LCA' ? 'X' : '';
+                    let evl = val === 'EVL' ? 'X' : '';
+
+                    rubricaTablaHtml += `
+                        <tr>
+                            <td style="padding: 6px; border: 1px solid #000;">${textoItem}</td>
+                            <td style="text-align: center; padding: 6px; border: 1px solid #000;"><b>${l}</b></td>
+                            <td style="text-align: center; padding: 6px; border: 1px solid #000;"><b>${lca}</b></td>
+                            <td style="text-align: center; padding: 6px; border: 1px solid #000;"><b>${evl}</b></td>
+                        </tr>
+                    `;
                 }
             });
-            rubricaResumenHtml += "</ul>";
+
+            rubricaTablaHtml += `</tbody></table>`;
 
             camposHtml = `<p>${inputsRecopilados.f_intro}</p><br>
                           <p><strong>RÚBRICA DE OBJETIVOS TERAPÉUTICOS:</strong> (L: Logrado | LCA: Logrado con Autonomía | EVL: En Vías de Logro)</p>
-                          ${rubricaResumenHtml}<br>
+                          ${rubricaTablaHtml}<br>
                           <p><strong>OBSERVACIONES ADICIONALES DE RÚBRICA:</strong><br>${inputsRecopilados.f_obs}</p>`;
         } else if (tipo === 'trimestral3') {
             inputsRecopilados.f_resumen = document.getElementById('f-resumen').value;
