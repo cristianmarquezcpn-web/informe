@@ -603,29 +603,29 @@
         let esTrimestral2 = (tipo === 'trimestral2');
 
         if (tipo === 'inicial') {
-            inputsRecopilados.f_motivo = document.getElementById('f-motivo').value;
-            inputsRecopilados.f_antecedentes = document.getElementById('f-antecedentes').value;
-            inputsRecopilados.f_actitud = document.getElementById('f-actitud').value;
-            inputsRecopilados.f_comprensivo = document.getElementById('f-comprensivo').value;
-            inputsRecopilados.f_expresivo = document.getElementById('f-expresivo').value;
+            inputsRecopilados.fmotivo = document.getElementById('f-motivo').value;
+            inputsRecopilados.fantecedentes = document.getElementById('f-antecedentes').value;
+            inputsRecopilados.factitud = document.getElementById('f-actitud').value;
+            inputsRecopilados.fcomprensivo = document.getElementById('f-comprensivo').value;
+            inputsRecopilados.fexpresivo = document.getElementById('f-expresivo').value;
             
-            camposHtml = `<p><strong>MOTIVO DE CONSULTA:</strong><br>${inputsRecopilados.f_motivo}</p><br>
-                          <p><strong>ANTECEDENTES RELEVANTES AL ÁREA:</strong><br>${inputsRecopilados.f_antecedentes}</p><br>
-                          <p><strong>ACTITUD OBSERVABLE DURANTE LOS ENCUENTROS:</strong><br>${inputsRecopilados.f_actitud}</p><br>
+            camposHtml = `<p><strong>MOTIVO DE CONSULTA:</strong><br>${inputsRecopilados.fmotivo}</p><br>
+                          <p><strong>ANTECEDENTES RELEVANTES AL ÁREA:</strong><br>${inputsRecopilados.fantecedentes}</p><br>
+                          <p><strong>ACTITUD OBSERVABLE DURANTE LOS ENCUENTROS:</strong><br>${inputsRecopilados.factitud}</p><br>
                           <p><strong>ASPECTO DEL LENGUAJE Y LA COMUNICACIÓN</strong></p>
-                          <p><strong>COMPRENSIVO:</strong><br>${inputsRecopilados.f_comprensivo}</p><br>
-                          <p><strong>EXPRESIVO:</strong><br>${inputsRecopilados.f_expresivo}</p>`;
+                          <p><strong>COMPRENSIVO:</strong><br>${inputsRecopilados.fcomprensivo}</p><br>
+                          <p><strong>EXPRESIVO:</strong><br>${inputsRecopilados.fexpresivo}</p>`;
         
         } else if (tipo === 'trimestral1') {
-            inputsRecopilados.f_test = document.getElementById('f-test').value;
-            inputsRecopilados.f_resultados = document.getElementById('f-resultados').value;
-            inputsRecopilados.f_sintesis = document.getElementById('f-sintesis').value;
-            inputsRecopilados.f_sugerencias = document.getElementById('f-sugerencias').value;
+            inputsRecopilados.ftest = document.getElementById('f-test').value;
+            inputsRecopilados.fresultados = document.getElementById('f-resultados').value;
+            inputsRecopilados.fsintesis = document.getElementById('f-sintesis').value;
+            inputsRecopilados.fsugerencias = document.getElementById('f-sugerencias').value;
 
-            camposHtml = `<p><strong>TEST ADMINISTRADOS:</strong><br>${inputsRecopilados.f_test}</p><br>
-                          <p><strong>RESULTADOS OBTENIDOS E INTERPRETACIÓN DE TEST:</strong><br>${inputsRecopilados.f_resultados}</p><br>
-                          <p><strong>SÍNTESIS Y CONCLUSIONES:</strong><br>${inputsRecopilados.f_sintesis}</p><br>
-                          <p><strong>SUGERENCIAS ESCUELA REGULAR:</strong><br>${inputsRecopilados.f_sugerencias}</p>`;
+            camposHtml = `<p><strong>TEST ADMINISTRADOS:</strong><br>${inputsRecopilados.ftest}</p><br>
+                          <p><strong>RESULTADOS OBTENIDOS E INTERPRETACIÓN DE TEST:</strong><br>${inputsRecopilados.fresultados}</p><br>
+                          <p><strong>SÍNTESIS Y CONCLUSIONES:</strong><br>${inputsRecopilados.fsintesis}</p><br>
+                          <p><strong>SUGERENCIAS ESCUELA REGULAR:</strong><br>${inputsRecopilados.fsugerencias}</p>`;
         
         } else if (tipo === 'trimestral2') {
             inputsRecopilados.f_intro = document.getElementById('f-intro') ? document.getElementById('f-intro').value : '';
@@ -635,21 +635,21 @@
                           <p><strong>OBSERVACIONES ADICIONALES DE RÚBRICA:</strong><br>${inputsRecopilados.f_obs}</p>`;
         
         } else if (tipo === 'trimestral3') {
-            inputsRecopilados.f_resumen = document.getElementById('f-resumen').value;
-            inputsRecopilados.f_sugfinal = document.getElementById('f-sugfinal').value;
-            camposHtml = `<p><strong>RESUMEN Y TRABAJO DEL ÚLTIMO TRIMESTRE:</strong><br>${inputsRecopilados.f_resumen}</p><br>
-                          <p><strong>SUGERENCIAS:</strong><br>${inputsRecopilados.f_sugfinal}</p>`;
+            inputsRecopilados.fresumen = document.getElementById('f-resumen').value;
+            inputsRecopilados.fsugfinal = document.getElementById('f-sugfinal').value;
+            camposHtml = `<p><strong>RESUMEN Y TRABAJO DEL ÚLTIMO TRIMESTRE:</strong><br>${inputsRecopilados.fresumen}</p><br>
+                          <p><strong>SUGERENCIAS:</strong><br>${inputsRecopilados.fsugfinal}</p>`;
         
         } else if (tipo === 'plan') {
-            inputsRecopilados.f_modtrat = document.getElementById('f-modtrat').value;
-            inputsRecopilados.f_objgen = document.getElementById('f-objgen').value;
-            inputsRecopilados.f_objesp = document.getElementById('f-objesp').value;
-            inputsRecopilados.f_estrategias = document.getElementById('f-estrategias').value;
+            inputsRecopilados.fmodtrat = document.getElementById('f-modtrat').value;
+            inputsRecopilados.fobjgen = document.getElementById('f-objgen').value;
+            inputsRecopilados.fobjesp = document.getElementById('f-objesp').value;
+            inputsRecopilados.festrategias = document.getElementById('f-estrategias').value;
 
-            camposHtml = `<p><strong>MODALIDAD DE TRATAMIENTO:</strong> ${inputsRecopilados.f_modtrat}</p><br>
-                          <p><strong>OBJETIVOS GENERALES:</strong><br>${inputsRecopilados.f_objgen.replace(/\n/g, '<br>')}</p><br>
-                          <p><strong>OBJETIVOS ESPECÍFICOS:</strong><br>${inputsRecopilados.f_objesp.replace(/\n/g, '<br>')}</p><br>
-                          <p><strong>ESTRATEGIAS GENERALES:</strong><br>${inputsRecopilados.f_estrategias}</p>`;
+            camposHtml = `<p><strong>MODALIDAD DE TRATAMIENTO:</strong> ${inputsRecopilados.fmodtrat}</p><br>
+                          <p><strong>OBJETIVOS GENERALES:</strong><br>${inputsRecopilados.fobjgen.replace(/\n/g, '<br>')}</p><br>
+                          <p><strong>OBJETIVOS ESPECÍFICOS:</strong><br>${inputsRecopilados.fobjesp.replace(/\n/g, '<br>')}</p><br>
+                          <p><strong>ESTRATEGIAS GENERALES:</strong><br>${inputsRecopilados.festrategias}</p>`;
         
         } else if (tipo === 'semestral') {
             const checkboxesSeleccionados = document.querySelectorAll('input[name="area-semestral"]:checked');
@@ -676,84 +676,23 @@
         let htmlGenerado = data.choices[0].message.content.replace(/```html/g, '').replace(/```/g, '').trim();
         
         if (esTrimestral2) {
-            const getVal = (id) => {
-                const el = document.getElementById(id);
-                return el ? el.value.toUpperCase().trim() : '';
-            };
+            const encabezadoHTML = typeof obtenerEncabezado === 'function' ? obtenerEncabezado() : '';
+            const piePaginaHTML = typeof obtenerPiePagina === 'function' ? obtenerPiePagina() : '';
+            const tablaRubricaHTML = armarTablaFallback();
 
-            const filasDatos = [
-                { cat: 'CONTROL POSTURAL', items: [
-                    { texto: 'Mejoró activación de la musculatura extensora de tronco', ids: ['r_cp1', 'r_cp2', 'r_cp3'] },
-                    { texto: 'Mejoró activación de la musculatura abdominal', ids: ['r_cp4', 'r_cp5', 'r_cp6'] },
-                    { texto: 'Se modificó la postura en flexión de tronco en sedestación', ids: ['r_cp7', 'r_cp8', 'r_cp9'] }
-                ]},
-                { cat: 'HABILIDADES MOTORAS GRUESAS', items: [
-                    { texto: 'Equilibrio dinámico', ids: ['r_hmg1_l', 'r_hmg1_lca', 'r_hmg1_evl'] },
-                    { texto: 'Equilibrio estático unipodal', ids: ['r_hmg2_l', 'r_hmg2_lca', 'r_hmg2_evl'] },
-                    { texto: 'Equilibrio estático bipodal', ids: ['r_hmg3_l', 'r_hmg3_lca', 'r_hmg3_evl'] },
-                    { texto: 'Se observa mejoras en la torpeza motora', ids: ['r_hmg4_l', 'r_hmg4_lca', 'r_hmg4_evl'] },
-                    { texto: 'Subir y bajar escaleras sin asistencia', ids: ['r_hmg5_l', 'r_hmg5_lca', 'r_hmg5_evl'] },
-                    { texto: 'Transferencias / transiciones', ids: ['r_hmg6_l', 'r_hmg6_lca', 'r_hmg6_evl'] },
-                    { texto: 'Correr sin caídas', ids: ['r_hmg7_l', 'r_hmg7_lca', 'r_hmg7_evl'] }
-                ]},
-                { cat: 'MOTRICIDAD FINA', items: [
-                    { texto: 'Agarra objetos con la mano', ids: ['r_mf1_l', 'r_mf1_lca', 'r_mf1_evl'] },
-                    { texto: 'Alcanza objetos con la mano', ids: ['r_mf2_l', 'r_mf2_lca', 'r_mf2_evl'] },
-                    { texto: 'Transporta objetos con la mano', ids: ['r_mf3_l', 'r_mf3_lca', 'r_mf3_evl'] },
-                    { texto: 'Realiza pinza digital', ids: ['r_mf4_l', 'r_mf4_lca', 'r_mf4_evl'] }
-                ]},
-                { cat: 'TONO MUSCULAR', items: [
-                    { texto: 'Se observa disminución del tono muscular en musculatura afectada', ids: ['r_tm1_l', 'r_tm1_lca', 'r_tm1_evl'] },
-                    { texto: 'Se observa mejoría del tono muscular bajo', ids: ['r_tm2_l', 'r_tm2_lca', 'r_tm2_evl'] }
-                ]},
-                { cat: 'COMUNICACIÓN E INTERÉS', items: [
-                    { texto: 'Se expresa a través de expresiones faciales de agrado y desagrado', ids: ['r_ci1_l', 'r_ci1_lca', 'r_ci1_evl'] },
-                    { texto: 'Comprende consignas simples', ids: ['r_ci2_l', 'r_ci2_lca', 'r_ci2_evl'] },
-                    { texto: 'Muestra interés durante las sesiones', ids: ['r_ci3_l', 'r_ci3_lca', 'r_ci3_evl'] }
-                ]}
-            ];
+            const valIntro = document.getElementById('f-intro') ? document.getElementById('f-intro').value.trim() : '';
+            const valObs = document.getElementById('f-obs') ? document.getElementById('f-obs').value.trim() : '';
 
-            let tablaHtml = `
-                <br>
-                <p><strong>OBJETIVOS TERAPÉUTICOS - RÚBRICA:</strong></p>
-                <div style="font-size: 11px; color: #555; margin-bottom: 5px;">Referencias: L = Logrado | LCA = Logrado con Autonomía | EVL = En Vías de Logro</div>
-                <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; font-family: 'Times New Roman', Times, serif; font-size: 13px; margin-top: 5px; margin-bottom: 15px; background-color: #ffffff;">
-                    <thead>
-                        <tr style="background-color: #f2f2f2;">
-                            <th style="border: 1px solid #000; padding: 6px; text-align: left; width: 76%;">Ítem de Evaluación</th>
-                            <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 8%;">L</th>
-                            <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 8%;">LCA</th>
-                            <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 8%;">EVL</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
+            let introTexto = (valIntro && valIntro.toUpperCase() !== 'NINGUNO') 
+                ? `<p><strong>INTRODUCCIÓN / DESCRIPCIÓN DEL TRIMESTRE:</strong><br>${valIntro}</p><br>` 
+                : '';
+                
+            let obsTexto = (valObs && valObs.toUpperCase() !== 'NINGUNO') 
+                ? `<br><p><strong>OBSERVACIONES ADICIONALES DE RÚBRICA:</strong><br>${valObs}</p>` 
+                : '';
 
-            filasDatos.forEach(grupo => {
-                tablaHtml += `<tr style="background-color: #e9ecef;"><td colspan="4" style="border: 1px solid #000; font-weight: bold; padding: 5px;">${grupo.cat}</td></tr>`;
-                grupo.items.forEach(it => {
-                    let valL = getVal(it.ids[0]) === 'X' || getVal(it.ids[0]) === 'L' ? 'X' : (getVal(it.ids[0]) || '');
-                    let valLca = getVal(it.ids[1]) === 'X' || getVal(it.ids[1]) === 'LCA' ? 'X' : (getVal(it.ids[1]) || '');
-                    let valEvl = getVal(it.ids[2]) === 'X' || getVal(it.ids[2]) === 'EVL' ? 'X' : (getVal(it.ids[2]) || '');
-
-                    tablaHtml += `
-                        <tr>
-                            <td style="border: 1px solid #000; padding: 5px; text-align: left;">${it.texto}</td>
-                            <td style="border: 1px solid #000; padding: 5px; text-align: center;"><b>${valL}</b></td>
-                            <td style="border: 1px solid #000; padding: 5px; text-align: center;"><b>${valLca}</b></td>
-                            <td style="border: 1px solid #000; padding: 5px; text-align: center;"><b>${valEvl}</b></td>
-                        </tr>
-                    `;
-                });
-            });
-
-            tablaHtml += `</tbody></table><br>`;
-
-            let introTexto = inputsRecopilados.f_intro ? `<p><strong>INTRODUCCIÓN / DESCRIPCIÓN DEL TRIMESTRE:</strong><br>${inputsRecopilados.f_intro}</p>` : '';
-            let obsTexto = inputsRecopilados.f_obs ? `<p><strong>OBSERVACIONES ADICIONALES DE RÚBRICA:</strong><br>${inputsRecopilados.f_obs}</p>` : '';
-
-            let contenidoFinal = `${introTexto}${introTexto ? '<br>' : ''}${tablaHtml}${obsTexto}`;
-            quillEditor.root.innerHTML = contenidoFinal;
+            let contenidoCompleto = `${encabezadoHTML}${introTexto}${tablaRubricaHTML}${obsTexto}${piePaginaHTML}`;
+            quillEditor.root.innerHTML = contenidoCompleto;
         } else {
             quillEditor.clipboard.dangerouslyPasteHTML(htmlGenerado);
         }
@@ -765,6 +704,81 @@
     }
     btn.disabled = false;
     btn.textContent = '🤖 CORREGIR Y PASAR AL EDITOR';
+}
+
+function armarTablaFallback() {
+    const getVal = (id) => {
+        const el = document.getElementById(id);
+        return el ? el.value.toUpperCase().trim() : '';
+    };
+
+    const filasDatos = [
+        { cat: 'CONTROL POSTURAL', items: [
+            { texto: 'Mejoró activación de la musculatura extensora de tronco', ids: ['rcp1', 'rcp2', 'rcp3'] },
+            { texto: 'Mejoró activación de la musculatura abdominal', ids: ['rcp4', 'rcp5', 'rcp6'] },
+            { texto: 'Se modificó la postura en flexión de tronco en sedestación', ids: ['rcp7', 'rcp8', 'rcp9'] }
+        ]},
+        { cat: 'HABILIDADES MOTORAS GRUESAS', items: [
+            { texto: 'Equilibrio dinámico', ids: ['rhmg1l', 'rhmg1lca', 'rhmg1evl'] },
+            { texto: 'Equilibrio estático unipodal', ids: ['rhmg2l', 'rhmg2lca', 'rhmg2evl'] },
+            { texto: 'Equilibrio estático bipodal', ids: ['rhmg3l', 'rhmg3lca', 'rhmg3evl'] },
+            { texto: 'Se observa mejoras en la torpeza motora', ids: ['rhmg4l', 'rhmg4lca', 'rhmg4evl'] },
+            { texto: 'Subir y bajar escaleras sin asistencia', ids: ['rhmg5l', 'rhmg5lca', 'rhmg5evl'] },
+            { texto: 'Transferencias / transiciones', ids: ['rhmg6l', 'rhmg6lca', 'rhmg6evl'] },
+            { texto: 'Correr sin caídas', ids: ['rhmg7l', 'rhmg7lca', 'rhmg7evl'] }
+        ]},
+        { cat: 'MOTRICIDAD FINA', items: [
+            { texto: 'Agarra objetos con la mano', ids: ['rmf1l', 'rmf1lca', 'rmf1evl'] },
+            { texto: 'Alcanza objetos con la mano', ids: ['rmf2l', 'rmf2lca', 'rmf2evl'] },
+            { texto: 'Transporta objetos con la mano', ids: ['rmf3l', 'rmf3lca', 'rmf3evl'] },
+            { texto: 'Realiza pinza digital', ids: ['rmf4l', 'rmf4lca', 'rmf4evl'] }
+        ]},
+        { cat: 'TONO MUSCULAR', items: [
+            { texto: 'Se observa disminución del tono muscular en musculatura afectada', ids: ['rtm1l', 'rtm1lca', 'rtm1evl'] },
+            { texto: 'Se observa mejoría del tono muscular bajo', ids: ['rtm2l', 'rtm2lca', 'rtm2evl'] }
+        ]},
+        { cat: 'COMUNICACIÓN E INTERÉS', items: [
+            { texto: 'Se expresa a través de expresiones faciales de agrado y desagrado', ids: ['rci1l', 'rci1lca', 'rci1evl'] },
+            { texto: 'Comprende consignas simples', ids: ['rci2l', 'rci2lca', 'rci2evl'] },
+            { texto: 'Muestra interés durante las sesiones', ids: ['rci3l', 'rci3lca', 'rci3evl'] }
+        ]}
+    ];
+
+    let html = `
+        <p><strong>OBJETIVOS TERAPÉUTICOS - RÚBRICA:</strong></p>
+        <div style="font-size: 11px; color: #555; margin-bottom: 5px;">Referencias: L = Logrado | LCA = Logrado con Autonomía | EVL = En Vías de Logro</div>
+        <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; font-family: 'Times New Roman', Times, serif; font-size: 13px; margin-top: 5px; margin-bottom: 15px; background-color: #ffffff;">
+            <thead>
+                <tr style="background-color: #f2f2f2;">
+                    <th style="border: 1px solid #000; padding: 6px; text-align: left; width: 76%;">Ítem de Evaluación</th>
+                    <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 8%;">L</th>
+                    <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 8%;">LCA</th>
+                    <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 8%;">EVL</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    filasDatos.forEach(grupo => {
+        html += `<tr style="background-color: #e9ecef;"><td colspan="4" style="border: 1px solid #000; font-weight: bold; padding: 5px;">${grupo.cat}</td></tr>`;
+        grupo.items.forEach(it => {
+            let valL = getVal(it.ids[0]) === 'X' || getVal(it.ids[0]) === 'L' ? 'X' : (getVal(it.ids[0]) || '');
+            let valLca = getVal(it.ids[1]) === 'X' || getVal(it.ids[1]) === 'LCA' ? 'X' : (getVal(it.ids[1]) || '');
+            let valEvl = getVal(it.ids[2]) === 'X' || getVal(it.ids[2]) === 'EVL' ? 'X' : (getVal(it.ids[2]) || '');
+
+            html += `
+                <tr>
+                    <td style="border: 1px solid #000; padding: 5px; text-align: left;">${it.texto}</td>
+                    <td style="border: 1px solid #000; padding: 5px; text-align: center;"><b>${valL}</b></td>
+                    <td style="border: 1px solid #000; padding: 5px; text-align: center;"><b>${valLca}</b></td>
+                    <td style="border: 1px solid #000; padding: 5px; text-align: center;"><b>${valEvl}</b></td>
+                </tr>
+            `;
+        });
+    });
+
+    html += `</tbody></table>`;
+    return html;
 }
     async function exportarPDF() {
     const nombre = document.getElementById('paciente-select').value;
