@@ -357,18 +357,81 @@
             cargarInformeArea();
         }
 
-        function cambiarEstructuraFormulario() {
-            const tipo = document.getElementById('tipo-informe').value;
-            const contenedor = document.getElementById('campos-dinamicos-modelo');
-            
-            if (tipo === 'inicial') {
-                contenedor.innerHTML = `
-                    <div style="margin-top:15px;"><label><b>MOTIVO DE CONSULTA:</b></label><textarea id="f-motivo" placeholder="Motivo de consulta..."></textarea></div>
-                    <div style="margin-top:15px;"><label><b>ANTECEDENTES RELEVANTES AL ÁREA:</b></label><textarea id="f-antecedentes" placeholder="Antecedentes..."></textarea></div>
-                    <div style="margin-top:15px;"><label><b>ACTITUD OBSERVABLE DURANTE LOS ENCUENTROS:</b></label><textarea id="f-actitud" placeholder="Actitud observable..."></textarea></div>
-                    <div style="margin-top:15px;"><label><b>ASPECTO DEL LENGUAJE Y LA COMUNICACIÓN - COMPRENSIVO:</b></label><textarea id="f-comprensivo" placeholder="Aspecto comprensivo..."></textarea></div>
-                    <div style="margin-top:15px;"><label><b>ASPECTO DEL LENGUAJE Y LA COMUNICACIÓN - EXPRESIVO:</b></label><textarea id="f-expresivo" placeholder="Aspecto expresivo..."></textarea></div>
-                `;
+    function cambiarEstructuraFormulario() {
+    const tipo = document.getElementById('tipo-informe').value;
+    const area = document.getElementById('area-rep').value;
+    const contenedor = document.getElementById('campos-dinamicos-modelo');
+    
+    if (tipo === 'inicial') {
+        if (area === 'Kinesiología') {
+            contenedor.innerHTML = `
+                <div style="margin-top:15px;"><label><b>MOTIVO DE CONSULTA:</b></label><textarea id="f-motivo" placeholder="Motivo de consulta..."></textarea></div>
+                <div style="margin-top:15px;">
+                    <label><b>ANTECEDENTES RELEVANTES AL ÁREA:</b></label>
+                    <div style="font-size: 11px; color: #666; margin-bottom: 3px;">(OPERACIONES, ANTECEDENTES RELEVANTES EN EL NACIMIENTO/ENFERMEDADES/COMPLICACIONES FÍSICAS/ETC ESTO ES A FIN DE GUIAR NO DEBE SALIR IMPRESO DIGAMOS ME EXPLICO)</div>
+                    <textarea id="f-antecedentes" placeholder="Antecedentes relevantes..."></textarea>
+                </div>
+                <div style="margin-top:15px;"><label><b>ACTITUD OBSERVABLE DURANTE LOS ENCUENTROS:</b></label><textarea id="f-actitud" placeholder="......................................................................."></textarea></div>
+                <div style="margin-top:15px;"><label>Teniendo en cuenta lo observado durante esta etapa inicial, se puede destacar lo siguiente:</label></div>
+                <div style="margin-top:10px; margin-left: 15px;"><label><b>● ASPECTO MOTOR</b></label><textarea id="f-aspectomotor" placeholder="Desarrollo del aspecto motor..."></textarea></div>
+            `;
+        } else if (area === 'Fonoaudiología') {
+            contenedor.innerHTML = `
+                <div style="margin-top:15px;"><label><b>MOTIVO DE CONSULTA:</b></label><textarea id="f-motivo" placeholder="Motivo de consulta..."></textarea></div>
+                <div style="margin-top:15px;"><label><b>ANTECEDENTES RELEVANTES AL ÁREA:</b></label><textarea id="f-antecedentes" placeholder="Antecedentes relevantes..."></textarea></div>
+                <div style="margin-top:15px;"><label><b>ACTITUD OBSERVABLE DURANTE LOS ENCUENTROS:</b></label><textarea id="f-actitud" placeholder="......................................................................."></textarea></div>
+                <div style="margin-top:15px;"><label>Teniendo en cuenta lo observado durante esta etapa inicial, se puede destacar lo siguiente:</label></div>
+                <div style="margin-top:10px; margin-left: 15px;"><label><b>● ASPECTO DEL LENGUAJE Y LA COMUNICACIÓN</b></label></div>
+                <div style="margin-top:10px; margin-left: 25px;"><label><b>COMPRENSIVO:</b></label><textarea id="f-comprensivo" placeholder="Aspecto comprensivo..."></textarea></div>
+                <div style="margin-top:10px; margin-left: 25px;"><label><b>EXPRESIVO:</b></label><textarea id="f-expresivo" placeholder="Aspecto expresivo..."></textarea></div>
+            `;
+        } else if (area === 'Psicopedagogía') {
+            contenedor.innerHTML = `
+                <div style="margin-top:15px;">
+                    <label><b>MOTIVO DE CONSULTA:</b></label>
+                    <div style="font-size: 11px; color: #666; margin-bottom: 3px;">(POR QUÉ NECESITA DE LA TERAPIA SEGÚN LA FAMILIA)</div>
+                    <textarea id="f-motivo" placeholder="Motivo de consulta..."></textarea>
+                </div>
+                <div style="margin-top:15px;">
+                    <label><b>ANTECEDENTES RELEVANTES AL ÁREA:</b></label>
+                    <div style="font-size: 11px; color: #666; margin-bottom: 3px;">(SITUACIÓN ESCOLAR/TRAYECTORIAS ESCOLARES/ALFABETIZACIÓN/MEDICACIÓN/ ETC)</div>
+                    <textarea id="f-antecedentes" placeholder="Antecedentes relevantes..."></textarea>
+                </div>
+                <div style="margin-top:15px;"><label><b>ACTITUD OBSERVABLE DURANTE LOS ENCUENTROS:</b></label><textarea id="f-actitud" placeholder="......................................................................."></textarea></div>
+                <div style="margin-top:15px;"><label>Teniendo en cuenta lo observado durante esta etapa inicial, se puede destacar lo siguiente:</label></div>
+                <div style="margin-top:10px; margin-left: 15px;"><label><b>● HÁBITOS DE TRABAJO:</b></label><textarea id="f-habitos" placeholder="Hábitos de trabajo..."></textarea></div>
+                <div style="margin-top:10px; margin-left: 15px;"><label><b>● ACTIVIDADES DIRIGIDAS:</b></label><textarea id="f-dirigidas" placeholder="Actividades dirigidas..."></textarea></div>
+                <div style="margin-top:10px; margin-left: 15px;"><label><b>● CONOCIMIENTO DEL ENTORNO Y CONCEPTOS BÁSICOS:</b></label><textarea id="f-entorno" placeholder="Conocimiento del entorno..."></textarea></div>
+                <div style="margin-top:10px; margin-left: 15px;"><label><b>● EXPRESIÓN GRÁFICA:</b></label><textarea id="f-grafica" placeholder="Expresión gráfica..."></textarea></div>
+                <div style="margin-top:10px; margin-left: 15px;"><label><b>● ACTIVIDAD LÚDICA:</b></label><textarea id="f-ludica" placeholder="Actividad lúdica..."></textarea></div>
+                <div style="margin-top:10px; margin-left: 15px;"><label><b>● PROCESOS COGNITIVOS:</b></label><textarea id="f-cognitivos" placeholder="Procesos cognitivos..."></textarea></div>
+                <div style="margin-top:10px; margin-left: 15px;"><label><b>● ÁREA ACADÉMICA:</b></label><textarea id="f-academica" placeholder="Área académica..."></textarea></div>
+            `;
+        } else if (area === 'Psicología') {
+            contenedor.innerHTML = `
+                <div style="margin-top:15px;"><label><b>MOTIVO DE CONSULTA:</b></label><textarea id="f-motivo" placeholder="Motivo de consulta..."></textarea></div>
+                <div style="margin-top:15px;">
+                    <label><b>ANTECEDENTES RELEVANTES AL ÁREA:</b></label>
+                    <div style="font-size: 11px; color: #666; margin-bottom: 3px;">(MEDICACIÓN/ESTADO EMOCIONAL/CONDUCTUAL/ SIT FAMILIAR/ACT. DE ALERTA)</div>
+                    <textarea id="f-antecedentes" placeholder="Antecedentes relevantes..."></textarea>
+                </div>
+                <div style="margin-top:15px;"><label><b>ACTITUD OBSERVABLE DURANTE LOS ENCUENTROS:</b></label><textarea id="f-actitud" placeholder="......................................................................."></textarea></div>
+                <div style="margin-top:15px;"><label>Teniendo en cuenta lo observado durante esta etapa inicial, se puede destacar lo siguiente:</label></div>
+                <div style="margin-top:10px; margin-left: 15px;"><label><b>ASPECTO SOCIO – EMOCIONAL:</b></label></div>
+                <div style="margin-top:10px; margin-left: 25px;"><label><b>● COMPORTAMIENTO GENERAL:</b></label><textarea id="f-comportamiento" placeholder="Comportamiento general..."></textarea></div>
+                <div style="margin-top:10px; margin-left: 25px;"><label><b>● RELACIONES SOCIALES:</b></label><textarea id="f-relaciones" placeholder="Relaciones sociales..."></textarea></div>
+                <div style="margin-top:10px; margin-left: 25px;"><label><b>● PARTICIPACIÓN E INTEGRACIÓN EN LAS DIFERENTES PROPUESTAS:</b></label><textarea id="f-participacion" placeholder="Participación e integración..."></textarea></div>
+                <div style="margin-top:10px; margin-left: 25px;"><label><b>● ÁREA EMOCIONAL Y VINCULAR:</b></label><textarea id="f-emocionalvincular" placeholder="Área emocional y vincular..."></textarea></div>
+            `;
+        } else {
+            // Estructura genérica si se selecciona otra área
+            contenedor.innerHTML = `
+                <div style="margin-top:15px;"><label><b>MOTIVO DE CONSULTA:</b></label><textarea id="f-motivo" placeholder="Motivo de consulta..."></textarea></div>
+                <div style="margin-top:15px;"><label><b>ANTECEDENTES RELEVANTES AL ÁREA:</b></label><textarea id="f-antecedentes" placeholder="Antecedentes..."></textarea></div>
+                <div style="margin-top:15px;"><label><b>ACTITUD OBSERVABLE DURANTE LOS ENCUENTROS:</b></label><textarea id="f-actitud" placeholder="......................................................................."></textarea></div>
+                <div style="margin-top:15px;"><label>Teniendo en cuenta lo observado durante esta etapa inicial, se puede destacar lo siguiente:</label></div>
+            `;
+        
             } else if (tipo === 'trimestral1') {
                 contenedor.innerHTML = `
                     <div style="margin-top:15px;"><label><b>TEST ADMINISTRADOS:</b></label><textarea id="f-test" placeholder="Test administrados..."></textarea></div>
@@ -602,7 +665,76 @@
         let camposHtml = "";
         let esTrimestral2 = (tipo === 'trimestral2');
 
-        if (tipo === 'inicial') {
+        if (tipo === 'inicial_kinesiologia') {
+            inputsRecopilados.fmotivo = document.getElementById('f-motivo').value;
+            inputsRecopilados.fantecedentes = document.getElementById('f-antecedentes').value;
+            inputsRecopilados.factitud = document.getElementById('f-actitud').value;
+
+            camposHtml = `<p><strong>MOTIVO DE CONSULTA:</strong><br>${inputsRecopilados.fmotivo}</p><br>
+                          <p><strong>ANTECEDENTES RELEVANTES AL ÁREA:</strong><br>${inputsRecopilados.fantecedentes}</p><br>
+                          <p><strong>ACTITUD OBSERVABLE DURANTE LOS ENCUENTROS:</strong><br>${inputsRecopilados.factitud}</p><br>
+                          <p>Teniendo en cuenta lo observado durante esta etapa inicial, se puede destacar lo siguiente:</p><br>
+                          <p><strong>● ASPECTO MOTOR</strong></p>`;
+
+        } else if (tipo === 'inicial_fonoaudiologia') {
+            inputsRecopilados.fmotivo = document.getElementById('f-motivo').value;
+            inputsRecopilados.fantecedentes = document.getElementById('f-antecedentes').value;
+            inputsRecopilados.factitud = document.getElementById('f-actitud').value;
+            inputsRecopilados.fcomprensivo = document.getElementById('f-comprensivo').value;
+            inputsRecopilados.fexpresivo = document.getElementById('f-expresivo').value;
+
+            camposHtml = `<p><strong>MOTIVO DE CONSULTA:</strong><br>${inputsRecopilados.fmotivo}</p><br>
+                          <p><strong>ANTECEDENTES RELEVANTES AL ÁREA:</strong><br>${inputsRecopilados.fantecedentes}</p><br>
+                          <p><strong>ACTITUD OBSERVABLE DURANTE LOS ENCUENTROS:</strong><br>${inputsRecopilados.factitud}</p><br>
+                          <p>Teniendo en cuenta lo observado durante esta etapa inicial, se puede destacar lo siguiente:</p><br>
+                          <p><strong>● ASPECTO DEL LENGUAJE Y LA COMUNICACIÓN</strong></p><br>
+                          <p><strong>COMPRENSIVO:</strong><br>${inputsRecopilados.fcomprensivo}</p><br>
+                          <p><strong>EXPRESIVO:</strong><br>${inputsRecopilados.fexpresivo}</p>`;
+
+        } else if (tipo === 'inicial_psicopedagogia') {
+            inputsRecopilados.fmotivo = document.getElementById('f-motivo').value;
+            inputsRecopilados.fantecedentes = document.getElementById('f-antecedentes').value;
+            inputsRecopilados.factitud = document.getElementById('f-actitud').value;
+            inputsRecopilados.fhabitos = document.getElementById('f-habitos').value;
+            inputsRecopilados.factual = document.getElementById('f-actual').value;
+            inputsRecopilados.fentorno = document.getElementById('f-entorno').value;
+            inputsRecopilados.fexpresion = document.getElementById('f-expresion').value;
+            inputsRecopilados.fludica = document.getElementById('f-ludica').value;
+            inputsRecopilados.fprocesos = document.getElementById('f-procesos').value;
+            inputsRecopilados.facademica = document.getElementById('f-academica').value;
+
+            camposHtml = `<p><strong>MOTIVO DE CONSULTA:</strong><br>${inputsRecopilados.fmotivo}</p><br>
+                          <p><strong>ANTECEDENTES RELEVANTES AL ÁREA:</strong><br>${inputsRecopilados.fantecedentes}</p><br>
+                          <p><strong>ACTITUD OBSERVABLE DURANTE LOS ENCUENTROS:</strong><br>${inputsRecopilados.factitud}</p><br>
+                          <p>Teniendo en cuenta lo observado durante esta etapa inicial, se puede destacar lo siguiente:</p><br>
+                          <p><strong>● HÁBITOS DE TRABAJO:</strong><br>${inputsRecopilados.fhabitos}</p><br>
+                          <p><strong>● ACTIVIDADES DIRIGIDAS:</strong><br>${inputsRecopilados.factual}</p><br>
+                          <p><strong>● CONOCIMIENTO DEL ENTORNO Y CONCEPTOS BÁSICOS:</strong><br>${inputsRecopilados.fentorno}</p><br>
+                          <p><strong>● EXPRESIÓN GRÁFICA:</strong><br>${inputsRecopilados.fexpresion}</p><br>
+                          <p><strong>● ACTIVIDAD LÚDICA:</strong><br>${inputsRecopilados.fludica}</p><br>
+                          <p><strong>● PROCESOS COGNITIVOS:</strong><br>${inputsRecopilados.fprocesos}</p><br>
+                          <p><strong>● ÁREA ACADÉMICA:</strong><br>${inputsRecopilados.facademica}</p>`;
+
+        } else if (tipo === 'inicial_psicologia') {
+            inputsRecopilados.fmotivo = document.getElementById('f-motivo').value;
+            inputsRecopilados.fantecedentes = document.getElementById('f-antecedentes').value;
+            inputsRecopilados.factitud = document.getElementById('f-actitud').value;
+            inputsRecopilados.fcomportamiento = document.getElementById('f-comportamiento').value;
+            inputsRecopilados.frelaciones = document.getElementById('f-relaciones').value;
+            inputsRecopilados.fparticipacion = document.getElementById('f-participacion').value;
+            inputsRecopilados.femocional = document.getElementById('f-emocional').value;
+
+            camposHtml = `<p><strong>MOTIVO DE CONSULTA:</strong><br>${inputsRecopilados.fmotivo}</p><br>
+                          <p><strong>ANTECEDENTES RELEVANTES AL ÁREA:</strong><br>${inputsRecopilados.fantecedentes}</p><br>
+                          <p><strong>ACTITUD OBSERVABLE DURANTE LOS ENCUENTROS:</strong><br>${inputsRecopilados.factitud}</p><br>
+                          <p>Teniendo en cuenta lo observado durante esta etapa inicial, se puede destacar lo siguiente:</p><br>
+                          <p><strong>ASPECTO SOCIO – EMOCIONAL:</strong></p><br>
+                          <p><strong>● COMPORTAMIENTO GENERAL:</strong><br>${inputsRecopilados.fcomportamiento}</p><br>
+                          <p><strong>● RELACIONES SOCIALES:</strong><br>${inputsRecopilados.frelaciones}</p><br>
+                          <p><strong>● PARTICIPACIÓN E INTEGRACIÓN EN LAS DIFERENTES PROPUESTAS:</strong><br>${inputsRecopilados.fparticipacion}</p><br>
+                          <p><strong>● ÁREA EMOCIONAL Y VINCULAR:</strong><br>${inputsRecopilados.femocional}</p>`;
+
+        } else if (tipo === 'inicial') {
             inputsRecopilados.fmotivo = document.getElementById('f-motivo').value;
             inputsRecopilados.fantecedentes = document.getElementById('f-antecedentes').value;
             inputsRecopilados.factitud = document.getElementById('f-actitud').value;
@@ -679,7 +811,6 @@
             const encabezadoHTML = typeof obtenerEncabezado === 'function' ? obtenerEncabezado() : '';
             const piePaginaHTML = typeof obtenerPiePagina === 'function' ? obtenerPiePagina() : '';
             
-            // Usamos el marcador rojo que Quill no borra para que exportarPDF() luego inserte la tabla real con bordes
             const marcadorTabla = `<p style="text-align: center; color: red; font-weight: bold; border: 1px dashed red; padding: 10px;">[[ LA TABLA DE RÚBRICA SE IMPRIMIRÁ AQUÍ EN EL PDF ]]</p>`;
 
             const valIntro = document.getElementById('f-intro') ? document.getElementById('f-intro').value.trim() : '';
@@ -708,91 +839,57 @@
     btn.textContent = '🤖 CORREGIR Y PASAR AL EDITOR';
 }
 function armarTablaFallback() {
-    const getVal = (id) => {
-        const el = document.getElementById(id);
-        if (!el) return '';
-        
-        // CORRECCIÓN: Si es un casillero para tildar (checkbox o radio)
-        if (el.type === 'checkbox' || el.type === 'radio') {
-            return el.checked ? 'X' : '';
-        }
-        
-        // Si es un campo de texto normal
-        const v = el.value.toUpperCase().trim();
-        if (v === 'X' || v === 'L' || v === 'LCA' || v === 'EVL') return 'X';
-        return v;
-    };
-
-    const filasDatos = [
-        { cat: 'CONTROL POSTURAL', items: [
-            { texto: 'Mejoró activación de la musculatura extensora de tronco', ids: ['rcp1', 'rcp2', 'rcp3'] },
-            { texto: 'Mejoró activación de la musculatura abdominal', ids: ['rcp4', 'rcp5', 'rcp6'] },
-            { texto: 'Se modificó la postura en flexión de tronco en sedestación', ids: ['rcp7', 'rcp8', 'rcp9'] }
-        ]},
-        { cat: 'HABILIDADES MOTORAS GRUESAS', items: [
-            { texto: 'Equilibrio dinámico', ids: ['rhmg1l', 'rhmg1lca', 'rhmg1evl'] },
-            { texto: 'Equilibrio estático unipodal', ids: ['rhmg2l', 'rhmg2lca', 'rhmg2evl'] },
-            { texto: 'Equilibrio estático bipodal', ids: ['rhmg3l', 'rhmg3lca', 'rhmg3evl'] },
-            { texto: 'Se observa mejoras en la torpeza motora', ids: ['rhmg4l', 'rhmg4lca', 'rhmg4evl'] },
-            { texto: 'Subir y bajar escaleras sin asistencia', ids: ['rhmg5l', 'rhmg5lca', 'rhmg5evl'] },
-            { texto: 'Transferencias / transiciones', ids: ['rhmg6l', 'rhmg6lca', 'rhmg6evl'] },
-            { texto: 'Correr sin caídas', ids: ['rhmg7l', 'rhmg7lca', 'rhmg7evl'] }
-        ]},
-        { cat: 'MOTRICIDAD FINA', items: [
-            { texto: 'Agarra objetos con la mano', ids: ['rmf1l', 'rmf1lca', 'rmf1evl'] },
-            { texto: 'Alcanza objetos con la mano', ids: ['rmf2l', 'rmf2lca', 'rmf2evl'] },
-            { texto: 'Transporta objetos con la mano', ids: ['rmf3l', 'rmf3lca', 'rmf3evl'] },
-            { texto: 'Realiza pinza digital', ids: ['rmf4l', 'rmf4lca', 'rmf4evl'] }
-        ]},
-        { cat: 'TONO MUSCULAR', items: [
-            { texto: 'Se observa disminución del tono muscular en musculatura afectada', ids: ['rtm1l', 'rtm1lca', 'rtm1evl'] },
-            { texto: 'Se observa mejoría del tono muscular bajo', ids: ['rtm2l', 'rtm2lca', 'rtm2evl'] }
-        ]},
-        { cat: 'COMUNICACIÓN E INTERÉS', items: [
-            { texto: 'Se expresa a través de expresiones faciales de agrado y desagrado', ids: ['rci1l', 'rci1lca', 'rci1evl'] },
-            { texto: 'Comprende consignas simples', ids: ['rci2l', 'rci2lca', 'rci2evl'] },
-            { texto: 'Muestra interés durante las sesiones', ids: ['rci3l', 'rci3lca', 'rci3evl'] }
-        ]}
-    ];
-
-    let html = `
-        <p><strong>OBJETIVOS TERAPÉUTICOS - RÚBRICA:</strong></p>
-        <div style="font-size: 11px; color: #555; margin-bottom: 5px;">Referencias: L = Logrado | LCA = Logrado con Autonomía | EVL = En Vías de Logro</div>
-        <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; font-family: 'Times New Roman', Times, serif; font-size: 13px; margin-top: 5px; margin-bottom: 15px; background-color: #ffffff;">
-            <thead>
-                <tr style="background-color: #f2f2f2;">
-                    <th style="border: 1px solid #000; padding: 6px; text-align: left; width: 76%;">Ítem de Evaluación</th>
-                    <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 8%;">L</th>
-                    <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 8%;">LCA</th>
-                    <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 8%;">EVL</th>
-                </tr>
-            </thead>
-            <tbody>
+    const filas = document.querySelectorAll('#tabla-rubrica-cuerpo tr');
+    let htmlTabla = `
+        <div style="margin-top: 20px; margin-bottom: 20px; page-break-inside: avoid;">
+            <div style="font-weight: bold; margin-bottom: 10px; font-size: 14px;">OBJETIVOS TERAPÉUTICOS - RÚBRICA:</div>
+            <div style="font-size: 11px; margin-bottom: 8px; color: #555;">Referencias: L = Logrado | LCA = Logrado con Autonomía | EVL = En Vías de Logro</div>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; font-family: 'Times New Roman', Times, serif;">
+                <thead>
+                    <tr style="background-color: #f2f2f2;">
+                        <th style="border: 1px solid #000; padding: 6px; text-align: left; width: 70%;">Ítem de Evaluación</th>
+                        <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 10%;">L</th>
+                        <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 10%;">LCA</th>
+                        <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 10%;">EVL</th>
+                    </tr>
+                </thead>
+                <tbody>
     `;
 
-    filasDatos.forEach(grupo => {
-        html += `<tr style="background-color: #e9ecef;"><td colspan="4" style="border: 1px solid #000; font-weight: bold; padding: 5px;">${grupo.cat}</td></tr>`;
-        grupo.items.forEach(it => {
-            let valL = getVal(it.ids[0]);
-            let valLca = getVal(it.ids[1]);
-            let valEvl = getVal(it.ids[2]);
+    filas.forEach(fila => {
+        const textoItem = fila.querySelector('.item-texto')?.innerText || '';
+        const esCategoria = fila.classList.contains('categoria-rubrica') || fila.querySelector('td')?.getAttribute('colspan') === '4';
 
-            html += `
-                <tr>
-                    <td style="border: 1px solid #000; padding: 5px; text-align: left;">${it.texto}</td>
-                    <td style="border: 1px solid #000; padding: 5px; text-align: center;"><b>${valL}</b></td>
-                    <td style="border: 1px solid #000; padding: 5px; text-align: center;"><b>${valLca}</b></td>
-                    <td style="border: 1px solid #000; padding: 5px; text-align: center;"><b>${valEvl}</b></td>
+        if (esCategoria) {
+            htmlTabla `
+                <tr style="background-color: #e6e6e6;">
+                    <td colspan="4" style="border: 1px solid #000; padding: 6px; font-weight: bold; text-transform: uppercase;">${textoItem}</td>
                 </tr>
             `;
-        });
+        } else {
+            const chkL = fila.querySelector('input[value="L"]')?.checked ? 'X' : '';
+            const chkLCA = fila.querySelector('input[value="LCA"]')?.checked ? 'X' : '';
+            const chkEVL = fila.querySelector('input[value="EVL"]')?.checked ? 'X' : '';
+
+            htmlTabla `
+                <tr>
+                    <td style="border: 1px solid #000; padding: 6px; text-align: left;">${textoItem}</td>
+                    <td style="border: 1px solid #000; padding: 6px; text-align: center; font-weight: bold;">${chkL}</td>
+                    <td style="border: 1px solid #000; padding: 6px; text-align: center; font-weight: bold;">${chkLCA}</td>
+                    <td style="border: 1px solid #000; padding: 6px; text-align: center; font-weight: bold;">${chkEVL}</td>
+                </tr>
+            `;
+        }
     });
 
-    html += `</tbody></table>`;
-    return html;
+    htmlTabla `
+                </tbody>
+            </table>
+        </div>
+    `;
+    return htmlTabla;
 }
-
-   function exportarPDF() {
+function exportarPDF() {
     const nombre = document.getElementById('paciente-select').value;
     if (!nombre) return alert("Selecciona un paciente.");
     
@@ -810,8 +907,8 @@ function armarTablaFallback() {
     const logoGuardado = localStorage.getItem('logo_institucional_esencial') || '';
     const pieGuardado = localStorage.getItem('pie_institucional_esencial') || '';
 
-    // 1. CALCULAMOS EL CONTENIDO PRIMERO (SEMESTRAL, RÚBRICA O QUILL NORMAL)
     let contenidoSemestralHtml = "";
+    
     if (tipoInforme.value === 'semestral') {
         const checkboxesSeleccionados = document.querySelectorAll('input[name="area-semestral"]:checked');
         let listaAreasHtml = "<ul>";
@@ -829,22 +926,68 @@ function armarTablaFallback() {
             ${listaAreasHtml}
             <div>${cuerpoSemestral}</div>
         `;
-    } else {
+    } 
+    else if (tipoInforme.value === 'inicial') {
+        const motivo = document.getElementById('f-motivo') ? document.getElementById('f-motivo').value.replace(/\n/g, '<br>') : '';
+        const antecedentes = document.getElementById('f-antecedentes') ? document.getElementById('f-antecedentes').value.replace(/\n/g, '<br>') : '';
+        const actitud = document.getElementById('f-actitud') ? document.getElementById('f-actitud').value.replace(/\n/g, '<br>') : '';
+        
+        let detalleEspecifico = "";
+
+        if (area === 'Kinesiología') {
+            const aspectomotor = document.getElementById('f-aspectomotor') ? document.getElementById('f-aspectomotor').value.replace(/\n/g, '<br>') : '';
+            detalleEspecifico = `
+                <p><b>● ASPECTO MOTOR</b></p>
+                <p>${aspectomotor}</p>
+            `;
+        } else if (area === 'Fonoaudiología') {
+            const comprensivo = document.getElementById('f-comprensivo') ? document.getElementById('f-comprensivo').value.replace(/\n/g, '<br>') : '';
+            const expresivo = document.getElementById('f-expresivo') ? document.getElementById('f-expresivo').value.replace(/\n/g, '<br>') : '';
+            detalleEspecifico = `
+                <p><b>● ASPECTO DEL LENGUAJE Y LA COMUNICACIÓN</b></p>
+                <p><b>COMPRENSIVO:</b> ${comprensivo}</p>
+                <p><b>EXPRESIVO:</b> ${expresivo}</p>
+            `;
+        } else if (area === 'Psicopedagogía') {
+            detalleEspecifico = `
+                <p><b>● HÁBITOS DE TRABAJO:</b> ${document.getElementById('f-habitos')?.value.replace(/\n/g, '<br>') || ''}</p>
+                <p><b>● ACTIVIDADES DIRIGIDAS:</b> ${document.getElementById('f-dirigidas')?.value.replace(/\n/g, '<br>') || ''}</p>
+                <p><b>● CONOCIMIENTO DEL ENTORNO Y CONCEPTOS BÁSICOS:</b> ${document.getElementById('f-entorno')?.value.replace(/\n/g, '<br>') || ''}</p>
+                <p><b>● EXPRESIÓN GRÁFICA:</b> ${document.getElementById('f-grafica')?.value.replace(/\n/g, '<br>') || ''}</p>
+                <p><b>● ACTIVIDAD LÚDICA:</b> ${document.getElementById('f-ludica')?.value.replace(/\n/g, '<br>') || ''}</p>
+                <p><b>● PROCESOS COGNITIVOS:</b> ${document.getElementById('f-cognitivos')?.value.replace(/\n/g, '<br>') || ''}</p>
+                <p><b>● ÁREA ACADÉMICA:</b> ${document.getElementById('f-academica')?.value.replace(/\n/g, '<br>') || ''}</p>
+            `;
+        } else if (area === 'Psicología') {
+            detalleEspecifico = `
+                <p><b>ASPECTO SOCIO – EMOCIONAL:</b></p>
+                <p><b>● COMPORTAMIENTO GENERAL:</b> ${document.getElementById('f-comportamiento')?.value.replace(/\n/g, '<br>') || ''}</p>
+                <p><b>● RELACIONES SOCIALES:</b> ${document.getElementById('f-relaciones')?.value.replace(/\n/g, '<br>') || ''}</p>
+                <p><b>● PARTICIPACIÓN E INTEGRACIÓN EN LAS DIFERENTES PROPUESTAS:</b> ${document.getElementById('f-participacion')?.value.replace(/\n/g, '<br>') || ''}</p>
+                <p><b>● ÁREA EMOCIONAL Y VINCULAR:</b> ${document.getElementById('f-emocionalvincular')?.value.replace(/\n/g, '<br>') || ''}</p>
+            `;
+        }
+
+        contenidoSemestralHtml = `
+            <p><b>MOTIVO DE CONSULTA:</b><br>${motivo}</p><br>
+            <p><b>ANTECEDENTES RELEVANTES AL ÁREA:</b><br>${antecedentes}</p><br>
+            <p><b>ACTITUD OBSERVABLE DURANTE LOS ENCUENTROS:</b><br>${actitud}</p><br>
+            <p>Teniendo en cuenta lo observado durante esta etapa inicial, se puede destacar lo siguiente:</p><br>
+            ${detalleEspecifico}
+        `;
+    } 
+    else {
         contenidoSemestralHtml = quillEditor.root.innerHTML;
     }
 
-    // 2. SI ES EL INFORME DE RÚBRICA, INYECTAMOS LA TABLA PERFECTA REEMPLAZANDO EL MARCADOR
     if (tipoInforme.value === 'trimestral2') {
         const tablaPerfecta = armarTablaFallback();
-        
-        // Reemplazamos cualquier variante del marcador por la tabla real con bordes y celdas
         contenidoSemestralHtml = contenidoSemestralHtml.replace(
             /<p[^>]*>\[\[ LA TABLA DE RÚBRICA SE IMPRIMIRÁ AQUÍ EN EL PDF \]\]<\/p>/g, 
             tablaPerfecta
         );
     }
 
-    // 3. CREAMOS EL ELEMENTO TEMPORAL PARA IMPRESIÓN
     const elementoTemporal = document.createElement('div');
     elementoTemporal.id = 'print-section';
     elementoTemporal.style.fontFamily = "'Times New Roman', Times, serif"; 
@@ -856,7 +999,38 @@ function armarTablaFallback() {
     
     const estiloImpresion = document.createElement('style');
     estiloImpresion.innerHTML = `
+        @page {
+            size: A4;
+            margin: 15mm 15mm 15mm 15mm;
+        }
         @media print {
+            thead { display: table-header-group; }
+            tfoot { display: table-footer-group; }
+            tr { page-break-inside: avoid; }
+            .header-impresion {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 110px;
+                background-color: #ffffff;
+                z-index: 1000;
+                text-align: center;
+            }
+            .footer-impresion {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 50px;
+                background-color: #ffffff;
+                z-index: 1000;
+                text-align: center;
+            }
+            .body-impresion {
+                margin-top: 120px;
+                margin-bottom: 60px;
+            }
             table { border-collapse: collapse !important; width: 100% !important; }
             th, td { border: 1px solid #000 !important; padding: 6px !important; }
         }
@@ -866,39 +1040,40 @@ function armarTablaFallback() {
     elementoTemporal.appendChild(estiloImpresion);
 
     elementoTemporal.innerHTML += `
-        <!-- ENCABEZADO -->
-        <div style="width: 100%; margin-bottom: 25px; text-align: center; background-color: #ffffff;">
+        <!-- ENCABEZADO FIJO EN TODAS LAS HOJAS -->
+        <div class="header-impresion" style="width: 100%; margin-bottom: 25px; text-align: center; background-color: #ffffff;">
             ${logoGuardado ? `<img src="${logoGuardado}" style="width: 100%; max-height: 110px; object-fit: fill; display: block;" />` : `
                 <h1 style="color: #1a2a6c; margin: 0; font-size: 38px; font-weight: bold; font-family: 'Georgia', serif;">Esencial</h1>
             `}
         </div>
 
-        <!-- CONTENEDOR CON PADDING PARA EL TEXTO -->
-        <div style="padding: 0 20px;">
-            <div style="text-align: center; font-weight: bold; margin-bottom: 25px; font-size: 15px;">
-                <div style="text-decoration: underline;">${textoTypeVal}</div>
-                <div style="margin-top: 5px;">${anioActual}</div>
-            </div>
+        <!-- CUERPO PRINCIPAL CON MARGENES PARA EVITAR SOLAPAMIENTO CON ENCABEZADO/PIE FIJOS -->
+        <div class="body-impresion">
+            <div style="padding: 0 20px;">
+                <div style="text-align: center; font-weight: bold; margin-bottom: 25px; font-size: 15px;">
+                    <div style="text-decoration: underline;">${textoTypeVal}</div>
+                    <div style="margin-top: 5px;">${anioActual}</div>
+                </div>
 
-            <ul style="list-style-type: disc; margin-bottom: 30px; padding-left: 40px; line-height: 1.8;">
-                <li><strong>ÁREA:</strong> <span style="text-transform: uppercase;">${area}</span></li>
-                <li><strong>APELLIDO Y NOMBRE DEL BENEFICIARIO:</strong> <span style="text-transform: uppercase;">${nombre}</span></li>
-                <li><strong>FECHA DE NACIMIENTO:</strong> ${fechaNac}</li>
-                <li><strong>EDAD:</strong> ${edad}</li>
-                <li><strong>DIAGNÓSTICO (SEGÚN CUD):</strong> ${diagnostico}</li>
-                <li><strong>FECHA DE INFORME:</strong> ${fechaHoy}</li>
-                <li><strong>PROFESIONAL / RESPONSABLE:</strong> <span style="text-transform: uppercase;">${profesional}</span></li>
-            </ul>
+                <ul style="list-style-type: disc; margin-bottom: 30px; padding-left: 40px; line-height: 1.8;">
+                    <li><strong>ÁREA:</strong> <span style="text-transform: uppercase;">${area}</span></li>
+                    <li><strong>APELLIDO Y NOMBRE DEL BENEFICIARIO:</strong> <span style="text-transform: uppercase;">${nombre}</span></li>
+                    <li><strong>FECHA DE NACIMIENTO:</strong> ${fechaNac}</li>
+                    <li><strong>EDAD:</strong> ${edad}</li>
+                    <li><strong>DIAGNÓSTICO (SEGÚN CUD):</strong> ${diagnostico}</li>
+                    <li><strong>FECHA DE INFORME:</strong> ${fechaHoy}</li>
+                    <li><strong>PROFESIONAL / RESPONSABLE:</strong> <span style="text-transform: uppercase;">${profesional}</span></li>
+                </ul>
 
-            <!-- CUERPO DEL INFORME (USANDO LA VARIABLE CORRECTA) -->
-            <div class="contenido-quill" style="line-height: 1.6; margin-bottom: 40px;">
-                ${contenidoSemestralHtml} 
+                <div class="contenido-quill" style="line-height: 1.6; margin-bottom: 40px;">
+                    ${contenidoSemestralHtml} 
+                </div>
             </div>
         </div>
 
-        <!-- PIE DE PÁGINA -->
-        <div style="width: 100%; margin-top: 40px; text-align: center; page-break-inside: avoid;">
-            ${pieGuardado ? `<img src="${pieGuardado}" style="width: 100%; max-height: 100px; object-fit: fill; display: block;" />` : `
+        <!-- PIE DE PÁGINA FIJO EN TODAS LAS HOJAS -->
+        <div class="footer-impresion" style="width: 100%; text-align: center;">
+            ${pieGuardado ? `<img src="${pieGuardado}" style="width: 100%; max-height: 50px; object-fit: fill; display: block;" />` : `
                 <div style="font-family: Arial, sans-serif; font-size: 10px; color: #1a2a6c;">
                     <div>www.esencialsalud.com.ar | 4323086 / 4210238</div>
                     <div>25 de mayo 30 (E) Ciudad de San Juan</div>
@@ -930,7 +1105,7 @@ function armarTablaFallback() {
         if (document.body.contains(elementoTemporal)) document.body.removeChild(elementoTemporal);
         alert("Error: " + err.message);
     }
-}      
+} 
         function guardarBorrador() {
             const nombre = document.getElementById('paciente-select').value;
             const area = document.getElementById('area-rep').value;
