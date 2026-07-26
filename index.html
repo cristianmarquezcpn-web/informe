@@ -588,7 +588,7 @@
             if(inf.contenidoHTML) quillEditor.clipboard.dangerouslyPasteHTML(inf.contenidoHTML);
             alert("¡Datos previos cargados en el editor!");
         }
-    async function generarBorradorIA() {
+ async function generarBorradorIA() {
     const nombre = document.getElementById('paciente-select').value;
     if (!nombre) return alert("Seleccioná un paciente primero.");
     
@@ -678,7 +678,9 @@
         if (esTrimestral2) {
             const encabezadoHTML = typeof obtenerEncabezado === 'function' ? obtenerEncabezado() : '';
             const piePaginaHTML = typeof obtenerPiePagina === 'function' ? obtenerPiePagina() : '';
-            const tablaRubricaHTML = armarTablaFallback();
+            
+            // Usamos el marcador rojo que Quill no borra para que exportarPDF() luego inserte la tabla real con bordes
+            const marcadorTabla = `<p style="text-align: center; color: red; font-weight: bold; border: 1px dashed red; padding: 10px;">[[ LA TABLA DE RÚBRICA SE IMPRIMIRÁ AQUÍ EN EL PDF ]]</p>`;
 
             const valIntro = document.getElementById('f-intro') ? document.getElementById('f-intro').value.trim() : '';
             const valObs = document.getElementById('f-obs') ? document.getElementById('f-obs').value.trim() : '';
@@ -691,7 +693,7 @@
                 ? `<br><p><strong>OBSERVACIONES ADICIONALES DE RÚBRICA:</strong><br>${valObs}</p>` 
                 : '';
 
-            let contenidoCompleto = `${encabezadoHTML}${introTexto}${tablaRubricaHTML}${obsTexto}${piePaginaHTML}`;
+            let contenidoCompleto = `${encabezadoHTML}${introTexto}${marcadorTabla}${obsTexto}${piePaginaHTML}`;
             quillEditor.root.innerHTML = contenidoCompleto;
         } else {
             quillEditor.clipboard.dangerouslyPasteHTML(htmlGenerado);
@@ -705,11 +707,20 @@
     btn.disabled = false;
     btn.textContent = '🤖 CORREGIR Y PASAR AL EDITOR';
 }
-
 function armarTablaFallback() {
     const getVal = (id) => {
         const el = document.getElementById(id);
-        return el ? el.value.toUpperCase().trim() : '';
+        if (!el) return '';
+        
+        // CORRECCIÓN: Si es un casillero para tildar (checkbox o radio)
+        if (el.type === 'checkbox' || el.type === 'radio') {
+            return el.checked ? 'X' : '';
+        }
+        
+        // Si es un campo de texto normal
+        const v = el.value.toUpperCase().trim();
+        if (v === 'X' || v === 'L' || v === 'LCA' || v === 'EVL') return 'X';
+        return v;
     };
 
     const filasDatos = [
@@ -744,31 +755,44 @@ function armarTablaFallback() {
         ]}
     ];
 
-    // Armamos el encabezado de la rúbrica usando texto plano y listas que Quill sí acepta
     let html = `
-        <br>
         <p><strong>OBJETIVOS TERAPÉUTICOS - RÚBRICA:</strong></p>
-        <p><strong style="color: #555;">Referencias: L = Logrado | LCA = Logrado con Autonomía | EVL = En Vías de Logro</strong></p>
+        <div style="font-size: 11px; color: #555; margin-bottom: 5px;">Referencias: L = Logrado | LCA = Logrado con Autonomía | EVL = En Vías de Logro</div>
+        <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; font-family: 'Times New Roman', Times, serif; font-size: 13px; margin-top: 5px; margin-bottom: 15px; background-color: #ffffff;">
+            <thead>
+                <tr style="background-color: #f2f2f2;">
+                    <th style="border: 1px solid #000; padding: 6px; text-align: left; width: 76%;">Ítem de Evaluación</th>
+                    <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 8%;">L</th>
+                    <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 8%;">LCA</th>
+                    <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 8%;">EVL</th>
+                </tr>
+            </thead>
+            <tbody>
     `;
 
     filasDatos.forEach(grupo => {
-        html += `<br><p><strong><u>${grupo.cat}</u></strong></p><ul>`;
+        html += `<tr style="background-color: #e9ecef;"><td colspan="4" style="border: 1px solid #000; font-weight: bold; padding: 5px;">${grupo.cat}</td></tr>`;
         grupo.items.forEach(it => {
-            // Evaluamos si está marcado
-            let valL = (getVal(it.ids[0]) === 'X' || getVal(it.ids[0]) === 'L') ? 'X' : '&nbsp;&nbsp;&nbsp;';
-            let valLca = (getVal(it.ids[1]) === 'X' || getVal(it.ids[1]) === 'LCA') ? 'X' : '&nbsp;&nbsp;&nbsp;';
-            let valEvl = (getVal(it.ids[2]) === 'X' || getVal(it.ids[2]) === 'EVL') ? 'X' : '&nbsp;&nbsp;&nbsp;';
+            let valL = getVal(it.ids[0]);
+            let valLca = getVal(it.ids[1]);
+            let valEvl = getVal(it.ids[2]);
 
-            // Armamos la fila como un ítem de lista inborrable para Quill
-            html += `<li><strong>[ ${valL} ]</strong> L &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <strong>[ ${valLca} ]</strong> LCA &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <strong>[ ${valEvl} ]</strong> EVL &nbsp;&nbsp;&nbsp;➔&nbsp;&nbsp;&nbsp; ${it.texto}</li>`;
+            html += `
+                <tr>
+                    <td style="border: 1px solid #000; padding: 5px; text-align: left;">${it.texto}</td>
+                    <td style="border: 1px solid #000; padding: 5px; text-align: center;"><b>${valL}</b></td>
+                    <td style="border: 1px solid #000; padding: 5px; text-align: center;"><b>${valLca}</b></td>
+                    <td style="border: 1px solid #000; padding: 5px; text-align: center;"><b>${valEvl}</b></td>
+                </tr>
+            `;
         });
-        html += `</ul>`;
     });
 
-    html += `<br>`;
+    html += `</tbody></table>`;
     return html;
 }
-    async function exportarPDF() {
+
+   function exportarPDF() {
     const nombre = document.getElementById('paciente-select').value;
     if (!nombre) return alert("Selecciona un paciente.");
     
@@ -786,7 +810,7 @@ function armarTablaFallback() {
     const logoGuardado = localStorage.getItem('logo_institucional_esencial') || '';
     const pieGuardado = localStorage.getItem('pie_institucional_esencial') || '';
 
-    // 1. CALCULAMOS EL CONTENIDO PRIMERO (SEMESTRAL O QUILL NORMAL)
+    // 1. CALCULAMOS EL CONTENIDO PRIMERO (SEMESTRAL, RÚBRICA O QUILL NORMAL)
     let contenidoSemestralHtml = "";
     if (tipoInforme.value === 'semestral') {
         const checkboxesSeleccionados = document.querySelectorAll('input[name="area-semestral"]:checked');
@@ -809,11 +833,22 @@ function armarTablaFallback() {
         contenidoSemestralHtml = quillEditor.root.innerHTML;
     }
 
-    // 2. CREAMOS EL ELEMENTO TEMPORAL PARA IMPRESIÓN
+    // 2. SI ES EL INFORME DE RÚBRICA, INYECTAMOS LA TABLA PERFECTA REEMPLAZANDO EL MARCADOR
+    if (tipoInforme.value === 'trimestral2') {
+        const tablaPerfecta = armarTablaFallback();
+        
+        // Reemplazamos cualquier variante del marcador por la tabla real con bordes y celdas
+        contenidoSemestralHtml = contenidoSemestralHtml.replace(
+            /<p[^>]*>\[\[ LA TABLA DE RÚBRICA SE IMPRIMIRÁ AQUÍ EN EL PDF \]\]<\/p>/g, 
+            tablaPerfecta
+        );
+    }
+
+    // 3. CREAMOS EL ELEMENTO TEMPORAL PARA IMPRESIÓN
     const elementoTemporal = document.createElement('div');
     elementoTemporal.id = 'print-section';
     elementoTemporal.style.fontFamily = "'Times New Roman', Times, serif"; 
-    elementoTemporal.style.fontSize = "14px";
+    elementoTemporal.style.fontSize = "14px"; 
     elementoTemporal.style.padding = "0"; 
     elementoTemporal.style.backgroundColor = "#ffffff";
     elementoTemporal.style.boxSizing = "border-box";
@@ -895,7 +930,7 @@ function armarTablaFallback() {
         if (document.body.contains(elementoTemporal)) document.body.removeChild(elementoTemporal);
         alert("Error: " + err.message);
     }
-}        
+}      
         function guardarBorrador() {
             const nombre = document.getElementById('paciente-select').value;
             const area = document.getElementById('area-rep').value;
