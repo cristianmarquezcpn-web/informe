@@ -749,11 +749,10 @@
 
             tablaHtml += `</tbody></table><br>`;
 
-            let partes = htmlGenerado.split('OBSERVACIONES ADICIONALES DE RÚBRICA:');
-            let introMejorada = partes[0] || '';
-            let obsMejorada = partes[1] ? `<p><strong>OBSERVACIONES ADICIONALES DE RÚBRICA:</strong>${partes[1]}</p>` : '';
+            let introTexto = inputsRecopilados.f_intro ? `<p><strong>INTRODUCCIÓN / DESCRIPCIÓN DEL TRIMESTRE:</strong><br>${inputsRecopilados.f_intro}</p>` : '';
+            let obsTexto = inputsRecopilados.f_obs ? `<p><strong>OBSERVACIONES ADICIONALES DE RÚBRICA:</strong><br>${inputsRecopilados.f_obs}</p>` : '';
 
-            let contenidoFinal = `${introMejorada}<br>${tablaHtml}${obsMejorada}`;
+            let contenidoFinal = `${introTexto}${introTexto ? '<br>' : ''}${tablaHtml}${obsTexto}`;
             quillEditor.root.innerHTML = contenidoFinal;
         } else {
             quillEditor.clipboard.dangerouslyPasteHTML(htmlGenerado);
