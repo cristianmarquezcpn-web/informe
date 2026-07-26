@@ -744,40 +744,28 @@ function armarTablaFallback() {
         ]}
     ];
 
+    // Armamos el encabezado de la rúbrica usando texto plano y listas que Quill sí acepta
     let html = `
+        <br>
         <p><strong>OBJETIVOS TERAPÉUTICOS - RÚBRICA:</strong></p>
-        <div style="font-size: 11px; color: #555; margin-bottom: 5px;">Referencias: L = Logrado | LCA = Logrado con Autonomía | EVL = En Vías de Logro</div>
-        <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; font-family: 'Times New Roman', Times, serif; font-size: 13px; margin-top: 5px; margin-bottom: 15px; background-color: #ffffff;">
-            <thead>
-                <tr style="background-color: #f2f2f2;">
-                    <th style="border: 1px solid #000; padding: 6px; text-align: left; width: 76%;">Ítem de Evaluación</th>
-                    <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 8%;">L</th>
-                    <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 8%;">LCA</th>
-                    <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 8%;">EVL</th>
-                </tr>
-            </thead>
-            <tbody>
+        <p><strong style="color: #555;">Referencias: L = Logrado | LCA = Logrado con Autonomía | EVL = En Vías de Logro</strong></p>
     `;
 
     filasDatos.forEach(grupo => {
-        html += `<tr style="background-color: #e9ecef;"><td colspan="4" style="border: 1px solid #000; font-weight: bold; padding: 5px;">${grupo.cat}</td></tr>`;
+        html += `<br><p><strong><u>${grupo.cat}</u></strong></p><ul>`;
         grupo.items.forEach(it => {
-            let valL = getVal(it.ids[0]) === 'X' || getVal(it.ids[0]) === 'L' ? 'X' : (getVal(it.ids[0]) || '');
-            let valLca = getVal(it.ids[1]) === 'X' || getVal(it.ids[1]) === 'LCA' ? 'X' : (getVal(it.ids[1]) || '');
-            let valEvl = getVal(it.ids[2]) === 'X' || getVal(it.ids[2]) === 'EVL' ? 'X' : (getVal(it.ids[2]) || '');
+            // Evaluamos si está marcado
+            let valL = (getVal(it.ids[0]) === 'X' || getVal(it.ids[0]) === 'L') ? 'X' : '&nbsp;&nbsp;&nbsp;';
+            let valLca = (getVal(it.ids[1]) === 'X' || getVal(it.ids[1]) === 'LCA') ? 'X' : '&nbsp;&nbsp;&nbsp;';
+            let valEvl = (getVal(it.ids[2]) === 'X' || getVal(it.ids[2]) === 'EVL') ? 'X' : '&nbsp;&nbsp;&nbsp;';
 
-            html += `
-                <tr>
-                    <td style="border: 1px solid #000; padding: 5px; text-align: left;">${it.texto}</td>
-                    <td style="border: 1px solid #000; padding: 5px; text-align: center;"><b>${valL}</b></td>
-                    <td style="border: 1px solid #000; padding: 5px; text-align: center;"><b>${valLca}</b></td>
-                    <td style="border: 1px solid #000; padding: 5px; text-align: center;"><b>${valEvl}</b></td>
-                </tr>
-            `;
+            // Armamos la fila como un ítem de lista inborrable para Quill
+            html += `<li><strong>[ ${valL} ]</strong> L &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <strong>[ ${valLca} ]</strong> LCA &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; <strong>[ ${valEvl} ]</strong> EVL &nbsp;&nbsp;&nbsp;➔&nbsp;&nbsp;&nbsp; ${it.texto}</li>`;
         });
+        html += `</ul>`;
     });
 
-    html += `</tbody></table>`;
+    html += `<br>`;
     return html;
 }
     async function exportarPDF() {
