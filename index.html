@@ -376,157 +376,13 @@
                     <div style="margin-top:15px;"><label><b>SÍNTESIS Y CONCLUSIONES:</b></label><textarea id="f-sintesis" placeholder="Conclusiones..."></textarea></div>
                     <div style="margin-top:15px;"><label><b>SUGERENCIAS ESCUELA REGULAR:</b></label><textarea id="f-sugerencias" placeholder="Sugerencias..."></textarea></div>
                 `;
-            } else if (tipo === 'trimestral2') {
-                contenedor.innerHTML = `
-                    <div style="margin-top:15px;"><label><b>INTRODUCCIÓN / DESCRIPCIÓN DEL TRIMESTRE:</b></label><textarea id="f-intro" placeholder="Durante este segundo trimestre..."></textarea></div>
-                    
-                    <div style="margin-top:15px;">
-                        <label><b>OBJETIVOS TERAPÉUTICOS - RÚBRICA:</b></label>
-                        <div style="font-size: 12px; color: #555; margin-bottom: 5px;">Referencias: L = Logrado | LCA = Logrado con Autonomía | EVL = En Vías de Logro</div>
-                        <table class="rubrica" id="tabla-rubrica-inputs" style="width:100%; border-collapse: collapse; font-size: 13px;" border="1">
-                            <thead>
-                                <tr style="background-color: #f2f2f2;">
-                                    <th style="text-align: left; padding: 6px;">Ítem de Evaluación</th>
-                                    <th style="width: 70px; text-align: center; padding: 6px;">L</th>
-                                    <th style="width: 70px; text-align: center; padding: 6px;">LCA</th>
-                                    <th style="width: 70px; text-align: center; padding: 6px;">EVL</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- CONTROL POSTURAL -->
-                                <tr style="background-color: #e9ecef;"><td colspan="4" style="font-weight: bold; padding: 5px;">CONTROL POSTURAL</td></tr>
-                                <tr>
-                                    <td style="padding: 5px;">Mejoró activación de la musculatura extensora de tronco</td>
-                                    <td style="text-align: center;"><input type="text" id="r_cp1" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_cp2" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_cp3" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 5px;">Mejoró activación de la musculatura abdominal</td>
-                                    <td style="text-align: center;"><input type="text" id="r_cp4" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_cp5" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_cp6" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 5px;">Se modificó la postura en flexión de tronco en sedestación</td>
-                                    <td style="text-align: center;"><input type="text" id="r_cp7" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_cp8" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_cp9" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                </tr>
+                } else if (tipo === 'trimestral2') {
+                inputsRecopilados.f_intro = document.getElementById('f-intro').value;
+                inputsRecopilados.f_obs = document.getElementById('f-obs').value;
 
-                                <!-- HABILIDADES MOTORAS GRUESAS -->
-                                <tr style="background-color: #e9ecef;"><td colspan="4" style="font-weight: bold; padding: 5px;">HABILIDADES MOTORAS GRUESAS</td></tr>
-                                <tr>
-                                    <td style="padding: 5px;">Equilibrio dinámico</td>
-                                    <td style="text-align: center;"><input type="text" id="r_hmg1_l" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_hmg1_lca" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_hmg1_evl" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 5px;">Equilibrio estático unipodal</td>
-                                    <td style="text-align: center;"><input type="text" id="r_hmg2_l" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_hmg2_lca" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_hmg2_evl" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 5px;">Equilibrio estático bipodal</td>
-                                    <td style="text-align: center;"><input type="text" id="r_hmg3_l" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_hmg3_lca" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_hmg3_evl" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 5px;">Se observa mejoras en la torpeza motora</td>
-                                    <td style="text-align: center;"><input type="text" id="r_hmg4_l" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_hmg4_lca" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_hmg4_evl" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 5px;">Subir y bajar escaleras sin asistencia</td>
-                                    <td style="text-align: center;"><input type="text" id="r_hmg5_l" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_hmg5_lca" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_hmg5_evl" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 5px;">Transferencias / transiciones</td>
-                                    <td style="text-align: center;"><input type="text" id="r_hmg6_l" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_hmg6_lca" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_hmg6_evl" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 5px;">Correr sin caídas</td>
-                                    <td style="text-align: center;"><input type="text" id="r_hmg7_l" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_hmg7_lca" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_hmg7_evl" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                </tr>
-
-                                <!-- MOTRICIDAD FINA -->
-                                <tr style="background-color: #e9ecef;"><td colspan="4" style="font-weight: bold; padding: 5px;">MOTRICIDAD FINA</td></tr>
-                                <tr>
-                                    <td style="padding: 5px;">Agarra objetos con la mano</td>
-                                    <td style="text-align: center;"><input type="text" id="r_mf1_l" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_mf1_lca" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_mf1_evl" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 5px;">Alcanza objetos con la mano</td>
-                                    <td style="text-align: center;"><input type="text" id="r_mf2_l" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_mf2_lca" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_mf2_evl" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 5px;">Transporta objetos con la mano</td>
-                                    <td style="text-align: center;"><input type="text" id="r_mf3_l" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_mf3_lca" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_mf3_evl" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 5px;">Realiza pinza digital</td>
-                                    <td style="text-align: center;"><input type="text" id="r_mf4_l" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_mf4_lca" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_mf4_evl" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                </tr>
-
-                                <!-- TONO MUSCULAR -->
-                                <tr style="background-color: #e9ecef;"><td colspan="4" style="font-weight: bold; padding: 5px;">TONO MUSCULAR</td></tr>
-                                <tr>
-                                    <td style="padding: 5px;">Se observa disminución del tono muscular en musculatura afectada</td>
-                                    <td style="text-align: center;"><input type="text" id="r_tm1_l" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_tm1_lca" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_tm1_evl" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 5px;">Se observa mejoría del tono muscular bajo</td>
-                                    <td style="text-align: center;"><input type="text" id="r_tm2_l" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_tm2_lca" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_tm2_evl" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                </tr>
-
-                                <!-- COMUNICACIÓN E INTERÉS -->
-                                <tr style="background-color: #e9ecef;"><td colspan="4" style="font-weight: bold; padding: 5px;">COMUNICACIÓN E INTERÉS</td></tr>
-                                <tr>
-                                    <td style="padding: 5px;">Se expresa a través de expresiones faciales de agrado y desagrado</td>
-                                    <td style="text-align: center;"><input type="text" id="r_ci1_l" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_ci1_lca" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_ci1_evl" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 5px;">Comprende consignas simples</td>
-                                    <td style="text-align: center;"><input type="text" id="r_ci2_l" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_ci2_lca" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_ci2_evl" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 5px;">Muestra interés durante las sesiones</td>
-                                    <td style="text-align: center;"><input type="text" id="r_ci3_l" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_ci3_lca" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                    <td style="text-align: center;"><input type="text" id="r_ci3_evl" maxlength="3" style="width: 40px; text-align: center;"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div style="margin-top:15px;"><label><b>OBSERVACIONES ADICIONALES DE RÚBRICA:</b></label><textarea id="f-obs" placeholder="Observaciones adicionales..."></textarea></div>
-                `;
+                camposHtml = `<p><strong>INTRODUCCIÓN / DESCRIPCIÓN DEL TRIMESTRE:</strong><br>${inputsRecopilados.f_intro}</p><br>
+                <p><strong>OBSERVACIONES ADICIONALES DE RÚBRICA:</strong><br>${inputsRecopilados.f_obs}</p>`;
+            }
             } else if (tipo === 'trimestral3') {
                 contenedor.innerHTML = `
                     <div style="margin-top:15px;"><label><b>RESUMEN GENERAL Y TRABAJO DEL ÚLTIMO TRIMESTRE:</b></label><textarea id="f-resumen" placeholder="Realizar un resumen de todos los informes y lo trabajado este último trimestre..."></textarea></div>
@@ -624,56 +480,86 @@ async function generarBorradorIA() {
                           <p><strong>RESULTADOS OBTENIDOS E INTERPRETACIÓN DE TEST:</strong><br>${inputsRecopilados.f_resultados}</p><br>
                           <p><strong>SÍNTESIS Y CONCLUSIONES:</strong><br>${inputsRecopilados.f_sintesis}</p><br>
                           <p><strong>SUGERENCIAS ESCUELA REGULAR:</strong><br>${inputsRecopilados.f_sugerencias}</p>`;
-        } else if (tipo === 'trimestral2') {
-            inputsRecopilados.f_intro = document.getElementById('f-intro').value;
-            inputsRecopilados.f_obs = document.getElementById('f-obs').value;
+        if (tipo === 'trimestral2') {
+    // Función auxiliar para leer el valor de un input si existe
+    const getVal = (id) => {
+        const el = document.getElementById(id);
+        return el ? el.value.toUpperCase().trim() : '';
+    };
 
-            const tablaInputs = document.querySelectorAll('#tabla-rubrica-inputs input');
-            
-            let tablaHtml = `
-                <br>
-                <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; font-family: 'Times New Roman', Times, serif; font-size: 13px; margin-top: 10px; margin-bottom: 15px; background-color: #ffffff;">
-                    <thead>
-                        <tr style="background-color: #f2f2f2;">
-                            <th rowspan="2" style="border: 1px solid #000; padding: 8px; text-align: left; vertical-align: middle; width: 70%;">OBJETIVOS TERAPÉUTICOS</th>
-                            <th colspan="3" style="border: 1px solid #000; padding: 6px; text-align: center; vertical-align: middle; width: 30%;">RÚBRICA</th>
-                        </tr>
-                        <tr style="background-color: #f2f2f2;">
-                            <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 10%;">L</th>
-                            <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 10%;">LCA</th>
-                            <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 10%;">EVL</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+    const filasDatos = [
+        { cat: 'CONTROL POSTURAL', items: [
+            { texto: 'Mejoró activación de la musculatura extensora de tronco', ids: ['r_cp1', 'r_cp2', 'r_cp3'] },
+            { texto: 'Mejoró activación de la musculatura abdominal', ids: ['r_cp4', 'r_cp5', 'r_cp6'] },
+            { texto: 'Se modificó la postura en flexión de tronco en sedestación', ids: ['r_cp7', 'r_cp8', 'r_cp9'] }
+        ]},
+        { cat: 'HABILIDADES MOTORAS GRUESAS', items: [
+            { texto: 'Equilibrio dinámico', ids: ['r_hmg1_l', 'r_hmg1_lca', 'r_hmg1_evl'] },
+            { texto: 'Equilibrio estático unipodal', ids: ['r_hmg2_l', 'r_hmg2_lca', 'r_hmg2_evl'] },
+            { texto: 'Equilibrio estático bipodal', ids: ['r_hmg3_l', 'r_hmg3_lca', 'r_hmg3_evl'] },
+            { texto: 'Se observa mejoras en la torpeza motora', ids: ['r_hmg4_l', 'r_hmg4_lca', 'r_hmg4_evl'] },
+            { texto: 'Subir y bajar escaleras sin asistencia', ids: ['r_hmg5_l', 'r_hmg5_lca', 'r_hmg5_evl'] },
+            { texto: 'Transferencias / transiciones', ids: ['r_hmg6_l', 'r_hmg6_lca', 'r_hmg6_evl'] },
+            { texto: 'Correr sin caídas', ids: ['r_hmg7_l', 'r_hmg7_lca', 'r_hmg7_evl'] }
+        ]},
+        { cat: 'MOTRICIDAD FINA', items: [
+            { texto: 'Agarra objetos con la mano', ids: ['r_mf1_l', 'r_mf1_lca', 'r_mf1_evl'] },
+            { texto: 'Alcanza objetos con la mano', ids: ['r_mf2_l', 'r_mf2_lca', 'r_mf2_evl'] },
+            { texto: 'Transporta objetos con la mano', ids: ['r_mf3_l', 'r_mf3_lca', 'r_mf3_evl'] },
+            { texto: 'Realiza pinza digital', ids: ['r_mf4_l', 'r_mf4_lca', 'r_mf4_evl'] }
+        ]},
+        { cat: 'TONO MUSCULAR', items: [
+            { texto: 'Se observa disminución del tono muscular en musculatura afectada', ids: ['r_tm1_l', 'r_tm1_lca', 'r_tm1_evl'] },
+            { texto: 'Se observa mejoría del tono muscular bajo', ids: ['r_tm2_l', 'r_tm2_lca', 'r_tm2_evl'] }
+        ]},
+        { cat: 'COMUNICACIÓN E INTERÉS', items: [
+            { texto: 'Se expresa a través de expresiones faciales de agrado y desagrado', ids: ['r_ci1_l', 'r_ci1_lca', 'r_ci1_evl'] },
+            { texto: 'Comprende consignas simples', ids: ['r_ci2_l', 'r_ci2_lca', 'r_ci2_evl'] },
+            { texto: 'Muestra interés durante las sesiones', ids: ['r_ci3_l', 'r_ci3_lca', 'r_ci3_evl'] }
+        ]}
+    ];
+
+    let tablaHtml = `
+        <br>
+        <p><strong>OBJETIVOS TERAPÉUTICOS - RÚBRICA:</strong></p>
+        <div style="font-size: 11px; color: #555; margin-bottom: 5px;">Referencias: L = Logrado | LCA = Logrado con Autonomía | EVL = En Vías de Logro</div>
+        <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; font-family: 'Times New Roman', Times, serif; font-size: 13px; margin-top: 5px; margin-bottom: 15px; background-color: #ffffff;">
+            <thead>
+                <tr style="background-color: #f2f2f2;">
+                    <th style="border: 1px solid #000; padding: 6px; text-align: left; width: 76%;">Ítem de Evaluación</th>
+                    <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 8%;">L</th>
+                    <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 8%;">LCA</th>
+                    <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 8%;">EVL</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    filasDatos.forEach(grupo => {
+        tablaHtml += `<tr style="background-color: #e9ecef;"><td colspan="4" style="border: 1px solid #000; font-weight: bold; padding: 5px;">${grupo.cat}</td></tr>`;
+        grupo.items.forEach(it => {
+            let valL = getVal(it.ids[0]) === 'X' || getVal(it.ids[0]) === 'L' ? 'X' : (getVal(it.ids[0]) || '');
+            let valLca = getVal(it.ids[1]) === 'X' || getVal(it.ids[1]) === 'LCA' ? 'X' : (getVal(it.ids[1]) || '');
+            let valEvl = getVal(it.ids[2]) === 'X' || getVal(it.ids[2]) === 'EVL' ? 'X' : (getVal(it.ids[2]) || '');
+
+            tablaHtml += `
+                <tr>
+                    <td style="border: 1px solid #000; padding: 5px; text-align: left;">${it.texto}</td>
+                    <td style="border: 1px solid #000; padding: 5px; text-align: center;"><b>${valL}</b></td>
+                    <td style="border: 1px solid #000; padding: 5px; text-align: center;"><b>${valLca}</b></td>
+                    <td style="border: 1px solid #000; padding: 5px; text-align: center;"><b>${valEvl}</b></td>
+                </tr>
             `;
+        });
+    });
 
-            tablaInputs.forEach(input => {
-                if (input.value.trim() !== "") {
-                    const filaInput = input.closest('tr');
-                    const textoItem = filaInput ? filaInput.cells[0].innerText : 'Ítem';
-                    const val = input.value.toUpperCase();
-                    
-                    let l = val === 'L' ? 'X' : '';
-                    let lca = val === 'LCA' ? 'X' : '';
-                    let evl = val === 'EVL' ? 'X' : '';
+    tablaHtml += `</tbody></table><br>`;
 
-                    tablaHtml += `
-                        <tr>
-                            <td style="border: 1px solid #000; padding: 8px; vertical-align: middle; text-align: left;">${textoItem}</td>
-                            <td style="border: 1px solid #000; padding: 6px; text-align: center; vertical-align: middle;"><b>${l}</b></td>
-                            <td style="border: 1px solid #000; padding: 6px; text-align: center; vertical-align: middle;"><b>${lca}</b></td>
-                            <td style="border: 1px solid #000; padding: 6px; text-align: center; vertical-align: middle;"><b>${evl}</b></td>
-                        </tr>
-                    `;
-                }
-            });
-
-            tablaHtml += `</tbody></table><br>`;
-            
-            camposHtml = `<p>${inputsRecopilados.f_intro}</p><br>
-                          <p><strong>RÚBRICA DE OBJETIVOS TERAPÉUTICOS:</strong> (L: Logrado | LCA: Logrado con Autonomía | EVL: En Vías de Logro)</p><br>
-                          ${tablaHtml}<br>
-                          <p><strong>OBSERVACIONES ADICIONALES DE RÚBRICA:</strong><br>${inputsRecopilados.f_obs}</p>`;    
+    // Insertamos todo estructurado en el editor evitando que Quill destruya la tabla
+    let contenidoFinal = `<p><strong>INTRODUCCIÓN / DESCRIPCIÓN DEL TRIMESTRE:</strong></p>${htmlGenerado.split('OBSERVACIONES ADICIONALES DE RÚBRICA:')[0]}<br>${tablaHtml}<p><strong>OBSERVACIONES ADICIONALES DE RÚBRICA:</strong></p>${inputsRecopilados.f_obs}`;
+    
+    quillEditor.root.innerHTML = contenidoFinal;
+}
         } else if (tipo === 'trimestral3') {
             inputsRecopilados.f_resumen = document.getElementById('f-resumen').value;
             inputsRecopilados.f_sugfinal = document.getElementById('f-sugfinal').value;
