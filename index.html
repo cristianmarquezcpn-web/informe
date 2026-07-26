@@ -569,100 +569,101 @@
             if(inf.contenidoHTML) quillEditor.clipboard.dangerouslyPasteHTML(inf.contenidoHTML);
             alert("¡Datos previos cargados en el editor!");
         }
+async function generarBorradorIA() {
+    const nombre = document.getElementById('paciente-select').value;
+    if (!nombre) return alert("Seleccioná un paciente primero.");
+    
+    const btn = document.getElementById('btn-ia');
+    btn.disabled = true;
+    btn.textContent = '⏳ Mejorando redacción con IA...';
+    
+    try {
+        const tipo = document.getElementById('tipo-informe').value;
+        let inputsRecopilados = {};
+        let camposHtml = "";
 
-        async function generarBorradorIA() {
-            const nombre = document.getElementById('paciente-select').value;
-            if (!nombre) return alert("Seleccioná un paciente primero.");
+        if (tipo === 'inicial') {
+            inputsRecopilados.f_motivo = document.getElementById('f-motivo').value;
+            inputsRecopilados.f_antecedentes = document.getElementById('f-antecedentes').value;
+            inputsRecopilados.f_actitud = document.getElementById('f-actitud').value;
+            inputsRecopilados.f_comprensivo = document.getElementById('f-comprensivo').value;
+            inputsRecopilados.f_expresivo = document.getElementById('f-expresivo').value;
             
-            const btn = document.getElementById('btn-ia');
-            btn.disabled = true;
-            btn.textContent = '⏳ Mejorando redacción con IA...';
-            
-            try {
-                const tipo = document.getElementById('tipo-informe').value;
-                let inputsRecopilados = {};
-                let camposHtml = "";
+            camposHtml = `<p><strong>MOTIVO DE CONSULTA:</strong><br>${inputsRecopilados.f_motivo}</p><br>
+                          <p><strong>ANTECEDENTES RELEVANTES AL ÁREA:</strong><br>${inputsRecopilados.f_antecedentes}</p><br>
+                          <p><strong>ACTITUD OBSERVABLE DURANTE LOS ENCUENTROS:</strong><br>${inputsRecopilados.f_actitud}</p><br>
+                          <p><strong>ASPECTO DEL LENGUAJE Y LA COMUNICACIÓN</strong></p>
+                          <p><strong>COMPRENSIVO:</strong><br>${inputsRecopilados.f_comprensivo}</p><br>
+                          <p><strong>EXPRESIVO:</strong><br>${inputsRecopilados.f_expresivo}</p>`;
+        } else if (tipo === 'trimestral1') {
+            inputsRecopilados.f_test = document.getElementById('f-test').value;
+            inputsRecopilados.f_resultados = document.getElementById('f-resultados').value;
+            inputsRecopilados.f_sintesis = document.getElementById('f-sintesis').value;
+            inputsRecopilados.f_sugerencias = document.getElementById('f-sugerencias').value;
 
-                if (tipo === 'inicial') {
-                    inputsRecopilados.f_motivo = document.getElementById('f-motivo').value;
-                    inputsRecopilados.f_antecedentes = document.getElementById('f-antecedentes').value;
-                    inputsRecopilados.f_actitud = document.getElementById('f-actitud').value;
-                    inputsRecopilados.f_comprensivo = document.getElementById('f-comprensivo').value;
-                    inputsRecopilados.f_expresivo = document.getElementById('f-expresivo').value;
-                    
-                    camposHtml = `<p><strong>MOTIVO DE CONSULTA:</strong><br>${inputsRecopilados.f_motivo}</p><br>
-                                  <p><strong>ANTECEDENTES RELEVANTES AL ÁREA:</strong><br>${inputsRecopilados.f_antecedentes}</p><br>
-                                  <p><strong>ACTITUD OBSERVABLE DURANTE LOS ENCUENTROS:</strong><br>${inputsRecopilados.f_actitud}</p><br>
-                                  <p><strong>ASPECTO DEL LENGUAJE Y LA COMUNICACIÓN</strong></p>
-                                  <p><strong>COMPRENSIVO:</strong><br>${inputsRecopilados.f_comprensivo}</p><br>
-                                  <p><strong>EXPRESIVO:</strong><br>${inputsRecopilados.f_expresivo}</p>`;
-                } else if (tipo === 'trimestral1') {
-                    inputsRecopilados.f_test = document.getElementById('f-test').value;
-                    inputsRecopilados.f_resultados = document.getElementById('f-resultados').value;
-                    inputsRecopilados.f_sintesis = document.getElementById('f-sintesis').value;
-                    inputsRecopilados.f_sugerencias = document.getElementById('f-sugerencias').value;
+            camposHtml = `<p><strong>TEST ADMINISTRADOS:</strong><br>${inputsRecopilados.f_test}</p><br>
+                          <p><strong>RESULTADOS OBTENIDOS E INTERPRETACIÓN DE TEST:</strong><br>${inputsRecopilados.f_resultados}</p><br>
+                          <p><strong>SÍNTESIS Y CONCLUSIONES:</strong><br>${inputsRecopilados.f_sintesis}</p><br>
+                          <p><strong>SUGERENCIAS ESCUELA REGULAR:</strong><br>${inputsRecopilados.f_sugerencias}</p>`;
+        } else if (tipo === 'trimestral2') {
+            inputsRecopilados.f_intro = document.getElementById('f-intro').value;
+            inputsRecopilados.f_obs = document.getElementById('f-obs').value;
 
-                    camposHtml = `<p><strong>TEST ADMINISTRADOS:</strong><br>${inputsRecopilados.f_test}</p><br>
-                                  <p><strong>RESULTADOS OBTENIDOS E INTERPRETACIÓN DE TEST:</strong><br>${inputsRecopilados.f_resultados}</p><br>
-                                  <p><strong>SÍNTESIS Y CONCLUSIONES:</strong><br>${inputsRecopilados.f_sintesis}</p><br>
-                                  <p><strong>SUGERENCIAS ESCUELA REGULAR:</strong><br>${inputsRecopilados.f_sugerencias}</p>`;
-                } else if (tipo === 'trimestral2') {
-                    inputsRecopilados.f_intro = document.getElementById('f-intro').value;
-                    inputsRecopilados.f_obs = document.getElementById('f-obs').value;
-                    inputsRecopilados.r1 = document.getElementById('r1').value;
-                    inputsRecopilados.r2 = document.getElementById('r2').value;
-                    inputsRecopilados.r3 = document.getElementById('r3').value;
-                    inputsRecopilados.r4 = document.getElementById('r4').value;
-                    inputsRecopilados.r5 = document.getElementById('r5').value;
-
-                    camposHtml = `<p>${inputsRecopilados.f_intro}</p><br>
-                                  <p><strong>RÚBRICA DE OBJETIVOS TERAPÉUTICOS:</strong> (L: Logrado | LCA: Logrado con Autonomía | EVL: En Vías de Logro)</p>
-                                  <ul>
-                                      <li>Control postural: <b>[${inputsRecopilados.r1}]</b></li>
-                                      <li>Habilidades motoras gruesas: <b>[${inputsRecopilados.r2}]</b></li>
-                                      <li>Motricidad fina: <b>[${inputsRecopilados.r3}]</b></li>
-                                      <li>Tono muscular: <b>[${inputsRecopilados.r4}]</b></li>
-                                      <li>Comunicación e interés: <b>[${inputsRecopilados.r5}]</b></li>
-                                  </ul><br>
-                                  <p><strong>OBSERVACIÓN:</strong><br>${inputsRecopilados.f_obs}</p>`;
-                } else if (tipo === 'trimestral3') {
-                    inputsRecopilados.f_resumen = document.getElementById('f-resumen').value;
-                    inputsRecopilados.f_sugfinal = document.getElementById('f-sugfinal').value;
-                    camposHtml = `<p><strong>RESUMEN Y TRABAJO DEL ÚLTIMO TRIMESTRE:</strong><br>${inputsRecopilados.f_resumen}</p><br>
-                                  <p><strong>SUGERENCIAS:</strong><br>${inputsRecopilados.f_sugfinal}</p>`;
-                } else if (tipo === 'plan') {
-                    inputsRecopilados.f_modtrat = document.getElementById('f-modtrat').value;
-                    inputsRecopilados.f_objgen = document.getElementById('f-objgen').value;
-                    inputsRecopilados.f_objesp = document.getElementById('f-objesp').value;
-                    inputsRecopilados.f_estrategias = document.getElementById('f-estrategias').value;
-
-                    camposHtml = `<p><strong>MODALIDAD DE TRATAMIENTO:</strong> ${inputsRecopilados.f_modtrat}</p><br>
-                                  <p><strong>OBJETIVOS GENERALES:</strong><br>${inputsRecopilados.f_objgen.replace(/\n/g, '<br>')}</p><br>
-                                  <p><strong>OBJETIVOS ESPECÍFICOS:</strong><br>${inputsRecopilados.f_objesp.replace(/\n/g, '<br>')}</p><br>
-                                  <p><strong>ESTRATEGIAS GENERALES:</strong><br>${inputsRecopilados.f_estrategias}</p>`;
+            // Recopilamos todos los inputs de la nueva tabla de rúbrica de forma segura
+            const tablaInputs = document.querySelectorAll('#tabla-rubrica-inputs input');
+            let rubricaResumenHtml = "<ul>";
+            tablaInputs.forEach(input => {
+                if (input.value.trim() !== "") {
+                    const fila = input.closest('tr');
+                    const textoItem = fila ? fila.cells[0].innerText : 'Ítem';
+                    rubricaResumenHtml += `<li>${textoItem}: <b>[${input.value}]</b></li>`;
                 }
+            });
+            rubricaResumenHtml += "</ul>";
 
-                const prompt = `Actúa como un corrector ortotipográfico y redactor clínico profesional. Mejora la redacción, puntuación y fluidez de los siguientes campos sin alterar datos clínicos ni inventar nada. Devuelve el resultado en formato HTML limpio estructurado:\n${camposHtml}`;
-                
-                const respuesta = await fetch('https://api.deepseek.com/chat/completions', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer sk-0466f0ae0854462cbe67f590742d83ac' },
-                    body: JSON.stringify({ model: 'deepseek-v4-pro', messages: [{ role: 'user', content: prompt }], temperature: 0.3 })
-                });
-                
-                if (!respuesta.ok) throw new Error("Error en API IA");
-                const data = await respuesta.json();
-                let htmlGenerado = data.choices[0].message.content.replace(/```html/g, '').replace(/```/g, '').trim();
-                
-                quillEditor.clipboard.dangerouslyPasteHTML(htmlGenerado);
-                alert("¡Texto mejorado y cargado en el editor con éxito!");
-            } catch(e) {
-                console.error(e);
-                alert("Error al conectar con la IA.");
-            }
-            btn.disabled = false;
-            btn.textContent = '🤖 CORREGIR Y PASAR AL EDITOR';
+            camposHtml = `<p>${inputsRecopilados.f_intro}</p><br>
+                          <p><strong>RÚBRICA DE OBJETIVOS TERAPÉUTICOS:</strong> (L: Logrado | LCA: Logrado con Autonomía | EVL: En Vías de Logro)</p>
+                          ${rubricaResumenHtml}<br>
+                          <p><strong>OBSERVACIONES ADICIONALES DE RÚBRICA:</strong><br>${inputsRecopilados.f_obs}</p>`;
+        } else if (tipo === 'trimestral3') {
+            inputsRecopilados.f_resumen = document.getElementById('f-resumen').value;
+            inputsRecopilados.f_sugfinal = document.getElementById('f-sugfinal').value;
+            camposHtml = `<p><strong>RESUMEN Y TRABAJO DEL ÚLtimO TRIMESTRE:</strong><br>${inputsRecopilados.f_resumen}</p><br>
+                          <p><strong>SUGERENCIAS:</strong><br>${inputsRecopilados.f_sugfinal}</p>`;
+        } else if (tipo === 'plan') {
+            inputsRecopilados.f_modtrat = document.getElementById('f-modtrat').value;
+            inputsRecopilados.f_objgen = document.getElementById('f-objgen').value;
+            inputsRecopilados.f_objesp = document.getElementById('f-objesp').value;
+            inputsRecopilados.f_estrategias = document.getElementById('f-estrategias').value;
+
+            camposHtml = `<p><strong>MODALIDAD DE TRATAMIENTO:</strong> ${inputsRecopilados.f_modtrat}</p><br>
+                          <p><strong>OBJETIVOS GENERALES:</strong><br>${inputsRecopilados.f_objgen.replace(/\n/g, '<br>')}</p><br>
+                          <p><strong>OBJETIVOS ESPECÍFICOS:</strong><br>${inputsRecopilados.f_objesp.replace(/\n/g, '<br>')}</p><br>
+                          <p><strong>ESTRATEGIAS GENERALES:</strong><br>${inputsRecopilados.f_estrategias}</p>`;
         }
+
+        const prompt = `Actúa como un corrector ortotipográfico y redactor clínico profesional. Mejora la redacción, puntuación y fluidez de los siguientes campos sin alterar datos clínicos ni inventar nada. Devuelve el resultado en formato HTML limpio estructurado:\n${camposHtml}`;
+        
+        const respuesta = await fetch('https://api.deepseek.com/chat/completions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer sk-0466f0ae0854462cbe67f590742d83ac' },
+            body: JSON.stringify({ model: 'deepseek-v4-pro', messages: [{ role: 'user', content: prompt }], temperature: 0.3 })
+        });
+        
+        if (!respuesta.ok) throw new Error("Error en API IA");
+        const data = await respuesta.json();
+        let htmlGenerado = data.choices[0].message.content.replace(/```html/g, '').replace(/```/g, '').trim();
+        
+        quillEditor.clipboard.dangerouslyPasteHTML(htmlGenerado);
+        alert("¡Texto mejorado y cargado en el editor con éxito!");
+    } catch(e) {
+        console.error(e);
+        alert("Error al conectar con la IA.");
+    }
+    btn.disabled = false;
+    btn.textContent = '🤖 CORREGIR Y PASAR AL EDITOR';
+}
+        
 async function exportarPDF() {
     const nombre = document.getElementById('paciente-select').value;
     if (!nombre) return alert("Selecciona un paciente.");
