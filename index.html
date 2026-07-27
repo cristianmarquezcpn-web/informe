@@ -838,19 +838,20 @@
     btn.disabled = false;
     btn.textContent = '🤖 CORREGIR Y PASAR AL EDITOR';
 }
+
 function armarTablaFallback() {
     const filas = document.querySelectorAll('#tabla-rubrica-cuerpo tr');
     let htmlTabla = `
         <div style="margin-top: 20px; margin-bottom: 20px; page-break-inside: avoid;">
             <div style="font-weight: bold; margin-bottom: 10px; font-size: 14px;">OBJETIVOS TERAPÉUTICOS - RÚBRICA:</div>
-            <div style="font-size: 11px; margin-bottom: 8px; color: #555;">Referencias: L = Logrado | LCA = Logrado con Autonomía | EVL = En Vías de Logro</div>
+            <div style="font-size: 11px; margin-bottom: 8px; color: #555;">Referencias: <span style="color: red;">A</span> = Logrado | <span style="color: blue;">AC</span> = Logrado con Autonomía | P = En Vías de Logro</div>
             <table style="width: 100%; border-collapse: collapse; font-size: 12px; font-family: 'Times New Roman', Times, serif;">
                 <thead>
                     <tr style="background-color: #f2f2f2;">
                         <th style="border: 1px solid #000; padding: 6px; text-align: left; width: 70%;">Ítem de Evaluación</th>
-                        <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 10%;">L</th>
-                        <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 10%;">LCA</th>
-                        <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 10%;">EVL</th>
+                        <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 10%; color: red;">A</th>
+                        <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 10%; color: blue;">AC</th>
+                        <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 10%; color: green;">P</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -861,17 +862,17 @@ function armarTablaFallback() {
         const esCategoria = fila.classList.contains('categoria-rubrica') || fila.querySelector('td')?.getAttribute('colspan') === '4';
 
         if (esCategoria) {
-            htmlTabla `
+            htmlTabla += `
                 <tr style="background-color: #e6e6e6;">
                     <td colspan="4" style="border: 1px solid #000; padding: 6px; font-weight: bold; text-transform: uppercase;">${textoItem}</td>
                 </tr>
             `;
         } else {
-            const chkL = fila.querySelector('input[value="L"]')?.checked ? 'X' : '';
-            const chkLCA = fila.querySelector('input[value="LCA"]')?.checked ? 'X' : '';
-            const chkEVL = fila.querySelector('input[value="EVL"]')?.checked ? 'X' : '';
+            const chkL = fila.querySelector('input[value="L"]')?.checked ? '<span style="color: red;">X</span>' : '';
+            const chkLCA = fila.querySelector('input[value="LCA"]')?.checked ? '<span style="color: blue;">X</span>' : '';
+            const chkEVL = fila.querySelector('input[value="EVL"]')?.checked ? '<span style="color: green;">X</span>' : '';
 
-            htmlTabla `
+            htmlTabla += `
                 <tr>
                     <td style="border: 1px solid #000; padding: 6px; text-align: left;">${textoItem}</td>
                     <td style="border: 1px solid #000; padding: 6px; text-align: center; font-weight: bold;">${chkL}</td>
@@ -889,6 +890,7 @@ function armarTablaFallback() {
     `;
     return htmlTabla;
 }
+
 function exportarPDF() {
     const nombre = document.getElementById('paciente-select').value;
     if (!nombre) return alert("Selecciona un paciente.");
@@ -1105,7 +1107,7 @@ function exportarPDF() {
         if (document.body.contains(elementoTemporal)) document.body.removeChild(elementoTemporal);
         alert("Error: " + err.message);
     }
-} 
+}
         function guardarBorrador() {
             const nombre = document.getElementById('paciente-select').value;
             const area = document.getElementById('area-rep').value;
