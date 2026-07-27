@@ -844,44 +844,52 @@ function armarTablaFallback() {
     let htmlTabla = `
         <div style="margin-top: 20px; margin-bottom: 20px; page-break-inside: avoid;">
             <div style="font-weight: bold; margin-bottom: 10px; font-size: 14px;">OBJETIVOS TERAPÉUTICOS - RÚBRICA:</div>
-            <div style="font-size: 11px; margin-bottom: 8px; color: #555;">Referencias: <span style="color: red;">A</span> = Logrado | <span style="color: blue;">AC</span> = Logrado con Autonomía | P = En Vías de Logro</div>
-            <table style="width: 100%; border-collapse: collapse; font-size: 12px; font-family: 'Times New Roman', Times, serif;">
+            <div style="font-size: 11px; margin-bottom: 8px; color: #555;">Referencias: <span style="color: green;">P</span> = En Vías de Logro | <span style="color: red;">A</span> = Logrado | <span style="color: blue;">AC</span> = Logrado con Autonomía</div>
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; font-family: 'Times New Roman', Times, serif; border: 1px solid #000;">
                 <thead>
                     <tr style="background-color: #f2f2f2;">
                         <th style="border: 1px solid #000; padding: 6px; text-align: left; width: 70%;">Ítem de Evaluación</th>
+                        <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 10%; color: green;">P</th>
                         <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 10%; color: red;">A</th>
                         <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 10%; color: blue;">AC</th>
-                        <th style="border: 1px solid #000; padding: 6px; text-align: center; width: 10%; color: green;">P</th>
                     </tr>
                 </thead>
                 <tbody>
     `;
 
-    filas.forEach(fila => {
-        const textoItem = fila.querySelector('.item-texto')?.innerText || '';
-        const esCategoria = fila.classList.contains('categoria-rubrica') || fila.querySelector('td')?.getAttribute('colspan') === '4';
+    if (filas.length === 0) {
+        htmlTabla += `
+            <tr>
+                <td colspan="4" style="border: 1px solid #000; padding: 8px; text-align: center; font-style: italic;">No se encontraron filas en la rúbrica o el contenedor no está activo.</td>
+            </tr>
+        `;
+    } else {
+        filas.forEach(fila => {
+            const textoItem = fila.querySelector('.item-texto')?.innerText || fila.cells?.[0]?.innerText || '';
+            const esCategoria = fila.classList.contains('categoria-rubrica') || fila.querySelector('td')?.getAttribute('colspan') === '4';
 
-        if (esCategoria) {
-            htmlTabla += `
-                <tr style="background-color: #e6e6e6;">
-                    <td colspan="4" style="border: 1px solid #000; padding: 6px; font-weight: bold; text-transform: uppercase;">${textoItem}</td>
-                </tr>
-            `;
-        } else {
-            const chkL = fila.querySelector('input[value="L"]')?.checked ? '<span style="color: red;">X</span>' : '';
-            const chkLCA = fila.querySelector('input[value="LCA"]')?.checked ? '<span style="color: blue;">X</span>' : '';
-            const chkEVL = fila.querySelector('input[value="EVL"]')?.checked ? '<span style="color: green;">X</span>' : '';
+            if (esCategoria) {
+                htmlTabla += `
+                    <tr style="background-color: #e6e6e6;">
+                        <td colspan="4" style="border: 1px solid #000; padding: 6px; font-weight: bold; text-transform: uppercase;">${textoItem}</td>
+                    </tr>
+                `;
+            } else {
+                const chkP = fila.querySelector('input[value="EVL"]')?.checked ? '<span style="color: green; font-weight: bold;">X</span>' : '';
+                const chkA = fila.querySelector('input[value="L"]')?.checked ? '<span style="color: red; font-weight: bold;">X</span>' : '';
+                const chkAC = fila.querySelector('input[value="LCA"]')?.checked ? '<span style="color: blue; font-weight: bold;">X</span>' : '';
 
-            htmlTabla += `
-                <tr>
-                    <td style="border: 1px solid #000; padding: 6px; text-align: left;">${textoItem}</td>
-                    <td style="border: 1px solid #000; padding: 6px; text-align: center; font-weight: bold;">${chkL}</td>
-                    <td style="border: 1px solid #000; padding: 6px; text-align: center; font-weight: bold;">${chkLCA}</td>
-                    <td style="border: 1px solid #000; padding: 6px; text-align: center; font-weight: bold;">${chkEVL}</td>
-                </tr>
-            `;
-        }
-    });
+                htmlTabla += `
+                    <tr>
+                        <td style="border: 1px solid #000; padding: 6px; text-align: left;">${textoItem}</td>
+                        <td style="border: 1px solid #000; padding: 6px; text-align: center;">${chkP}</td>
+                        <td style="border: 1px solid #000; padding: 6px; text-align: center;">${chkA}</td>
+                        <td style="border: 1px solid #000; padding: 6px; text-align: center;">${chkAC}</td>
+                    </tr>
+                `;
+            }
+        });
+    }
 
     htmlTabla += `
                 </tbody>
@@ -1074,16 +1082,14 @@ function exportarPDF() {
         </div>
 
         <!-- PIE DE PÁGINA FIJO EN TODAS LAS HOJAS -->
-        <div class="footer-impresion" style="width: 100%; text-align: center;">
-            ${pieGuardado ? `<img src="${pieGuardado}" style="width: 100%; max-height: 50px; object-fit: fill; display: block;" />` : `
-                <div style="font-family: Arial, sans-serif; font-size: 10px; color: #1a2a6c;">
+        <div class="footer-impresion">
+            ${pieGuardado ? `<img src="${pieGuardado}" style="max-height: 100%; max-width: 100%; object-fit: contain; display: block; margin: 0 auto;" />` : `
+                <div style="font-family: Arial, sans-serif; font-size: 10px; color: #1a2a6c; border-top: 1px solid #ccc; padding-top: 5px;">
                     <div>www.esencialsalud.com.ar | 4323086 / 4210238</div>
                     <div>25 de mayo 30 (E) Ciudad de San Juan</div>
                 </div>
             `}
         </div>
-    `;
-
     document.body.appendChild(elementoTemporal);
 
     try {
