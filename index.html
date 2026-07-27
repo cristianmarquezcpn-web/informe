@@ -1049,7 +1049,8 @@ function exportarPDF() {
     `;
     elementoTemporal.appendChild(estiloImpresion);
 
-    elementoTemporal.innerHTML += `
+    // AQUÍ ESTABA EL CORTE: Se usa '=' y las comillas invertidas de forma correcta
+    elementoTemporal.innerHTML = `
         <!-- ENCABEZADO FIJO EN TODAS LAS HOJAS -->
         <div class="header-impresion" style="width: 100%; margin-bottom: 25px; text-align: center; background-color: #ffffff;">
             ${logoGuardado ? `<img src="${logoGuardado}" style="width: 100%; max-height: 110px; object-fit: fill; display: block;" />` : `
@@ -1082,7 +1083,7 @@ function exportarPDF() {
         </div>
 
         <!-- PIE DE PÁGINA FIJO EN TODAS LAS HOJAS -->
-        <div class="footer-impresion">
+        <div class="footer-impresion" style="width: 100%; text-align: center; background-color: #ffffff;">
             ${pieGuardado ? `<img src="${pieGuardado}" style="max-height: 100%; max-width: 100%; object-fit: contain; display: block; margin: 0 auto;" />` : `
                 <div style="font-family: Arial, sans-serif; font-size: 10px; color: #1a2a6c; border-top: 1px solid #ccc; padding-top: 5px;">
                     <div>www.esencialsalud.com.ar | 4323086 / 4210238</div>
@@ -1090,6 +1091,8 @@ function exportarPDF() {
                 </div>
             `}
         </div>
+    `;
+
     document.body.appendChild(elementoTemporal);
 
     try {
